@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Blog Article - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <div>
+            <a href="/" class="brand"> <i class="fas fa-heartbeat"></i> <span>Med_Minus</span> </a>
+            <nav class="sidebar-nav">
+                <a href="/dashboard/overview/"><i class="fas fa-chart-line"></i> Overview</a>
+                <a href="/dashboard/appointments/"><i class="fas fa-calendar-check"></i> Appointments</a>
+                <a href="/dashboard/doctors/"><i class="fas fa-user-md"></i> Doctors</a>
+                <a href="/dashboard/blogs/" class="active"><i class="fas fa-blog"></i> Blogs</a>
+                <a href="/dashboard/reviews/"><i class="fas fa-star"></i> Reviews</a>
+            </nav>
+        </div>
+        <div class="sidebar-footer">
+            <button onclick="handleLogout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="section-header">
+            <h2>Edit Blog Article</h2>
+            <a href="/dashboard/blogs/" class="action-btn btn-cancel"><i class="fas fa-arrow-left"></i> Back to Blogs</a>
+        </div>
+
+        <div class="admin-form-card">
+            <form id="blog-edit-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Blog Article Title:</label>
+                    <input type="text" id="blog-title" name="title" class="input-box" required>
+                </div>
+                <div class="form-group">
+                    <label>Author Name:</label>
+                    <input type="text" id="blog-author" name="author" class="input-box" required>
+                </div>
+                <div class="form-group">
+                    <label>Publish Date:</label>
+                    <input type="text" id="blog-date" name="date" class="input-box" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload New Thumbnail Photo (File Upload):</label>
+                    <input type="file" id="blog-image-file" name="image_file" accept="image/*" class="file-box">
+                </div>
+                <div class="form-group">
+                    <label>Or Photo Asset Path / URL:</label>
+                    <input type="text" id="blog-image" name="image" class="input-box">
+                </div>
+                <div class="form-group">
+                    <label>Summary Content:</label>
+                    <textarea id="blog-summary" name="summary" class="input-box" style="height: 12rem;" required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/dashboard/blogs/" class="action-btn btn-cancel">Cancel</a>
+                    <button type="submit" class="action-btn btn-approve">Update Article</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script src="/static/js/api.js?v=1.4"></script>
+<script src="/static/js/dashboard.js?v=1.4"></script>
+<script src="/static/js/dashboard_forms.js?v=1.4"></script>
+<script>
+    const pathParts = window.location.pathname.split('/');
+    const blogId = pathParts[pathParts.length - 2] || pathParts[pathParts.length - 1];
+    document.getElementById('blog-edit-form').setAttribute('data-blog-id', blogId);
+</script>
+</body>
+</html>

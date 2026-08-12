@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
     <!-- Modular CSS -->
-    <link rel="stylesheet" href="/static/css/global.css">
-    <link rel="stylesheet" href="/static/css/header.css">
+    <link rel="stylesheet" href="/static/css/global.css?v=1.1">
+    <link rel="stylesheet" href="/static/css/header.css?v=1.1">
     
     <style>
         body {
@@ -69,17 +69,25 @@
             font-size: 1.8rem;
             text-align: center;
             font-weight: 600;
+            background: var(--green);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .login-card .btn:hover {
+            background: #117a65;
         }
 
         .error-alert {
             display: none;
-            padding: 1rem;
+            padding: 1.2rem;
             margin-bottom: 1.5rem;
             border-radius: .5rem;
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
             font-size: 1.5rem;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -87,13 +95,13 @@
 
 <div class="login-card">
     <a href="/" class="logo"> <i class="fas fa-heartbeat"></i> <strong>Med_Minus</strong></a>
-    <h2>Admin Portal Authentication</h2>
+    Happy Admin Portal Authentication</h2>
 
     <div id="error-message" class="error-alert"></div>
 
-    <form id="login-form">
-        <input type="text" id="username" placeholder="Username" class="box" required autocomplete="username">
-        <input type="password" id="password" placeholder="Password" class="box" required autocomplete="current-password">
+    <form id="login-form" action="#" method="post">
+        <input type="text" id="username" name="username" placeholder="Username" class="box" required autocomplete="username">
+        <input type="password" id="password" name="password" placeholder="Password" class="box" required autocomplete="current-password">
         <button type="submit" id="login-btn" class="btn">Login to Dashboard <span class="fas fa-sign-in-alt"></span></button>
     </form>
 
@@ -102,24 +110,23 @@
     </div>
 </div>
 
-<script src="/static/js/api.js"></script>
+<script src="/static/js/api.js?v=1.1"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        // If already logged in, redirect straight to dashboard
-        const user = await window.ApiService.getCurrentUser();
-        if (user) {
-            window.location.href = '/dashboard/';
-            return;
-        }
-
+    document.addEventListener('DOMContentLoaded', () => {
         const form = document.getElementById('login-form');
         const errorAlert = document.getElementById('error-message');
         const loginBtn = document.getElementById('login-btn');
 
+        if (!form) return;
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
+            
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            const username = usernameInput ? usernameInput.value.trim() : '';
+            const password = passwordInput ? passwordInput.value.trim() : '';
 
             if (!username || !password) {
                 showError('Please enter both username and password.');
@@ -129,12 +136,18 @@
             loginBtn.disabled = true;
             loginBtn.textContent = 'Authenticating...';
 
-            const res = await window.ApiService.login(username, password);
+            try {
+                const res = await window.ApiService.login(username, password);
 
-            if (res.success) {
-                window.location.href = '/dashboard/';
-            } else {
-                showError(res.error || 'Invalid credentials. Access denied.');
+                if (res && res.success) {
+                    window.location.href = '/dashboard/overview/';
+                } else {
+                    showError((res && res.error) ? res.error : 'Invalid username or password.');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Login to Dashboard <span class="fas fa-sign-in-alt"></span>';
+                }
+            } catch (err) {
+                showError('Connection error. Please check your credentials.');
                 loginBtn.disabled = false;
                 loginBtn.innerHTML = 'Login to Dashboard <span class="fas fa-sign-in-alt"></span>';
             }
@@ -143,9 +156,6 @@
         function showError(msg) {
             errorAlert.textContent = msg;
             errorAlert.style.display = 'block';
-            setTimeout(() => {
-                errorAlert.style.display = 'none';
-            }, 5000);
         }
     });
 </script>

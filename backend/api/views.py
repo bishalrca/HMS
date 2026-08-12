@@ -1,13 +1,33 @@
+import os
+from pathlib import Path
+from django.conf import settings
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+
 from .models import Doctor, Appointment, Review, Blog
 from .serializers import DoctorSerializer, AppointmentSerializer, ReviewSerializer, BlogSerializer
 
+# Helper to save uploaded file
+def save_uploaded_file(uploaded_file, folder='uploads'):
+    folder_path = Path(settings.MEDIA_ROOT) / folder
+    folder_path.mkdir(parents=True, exist_ok=True)
+    
+    file_path = folder_path / uploaded_file.name
+    saved_path = default_storage.save(f"{folder}/{uploaded_file.name}", ContentFile(uploaded_file.read()))
+    return f"/media/{saved_path}"
+
 # Authentication API Views
+@method_decorator(csrf_exempt, name='dispatch')
 class LoginAPIView(APIView):
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
 
     def post(self, request):
         username = request.data.get('username')
@@ -36,8 +56,10 @@ class LoginAPIView(APIView):
         else:
             return Response({'error': 'Invalid username or password.'}, status=status.HTTP_401_UNAUTHORIZED)
 
+@method_decorator(csrf_exempt, name='dispatch')
 class LogoutAPIView(APIView):
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
 
     def post(self, request):
         logout(request)
@@ -58,20 +80,45 @@ class CurrentUserAPIView(APIView):
             })
         return Response({'authenticated': False}, status=status.HTTP_200_OK)
 
-# Doctors Endpoints
+# Doctors Endpoints with Image Upload support
 class DoctorListCreateAPIView(generics.ListCreateAPIView):
     queryset = Doctor.objects.all().order_by('-id')
     serializer_class = DoctorSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
 
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        if 'image_file' in request.FILES:
+            data['image'] = save_uploaded_file(request.FILES['image_file'], 'doctors')
+        
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 class DoctorDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = request.data.copy()
+        
+        if 'image_file' in request.FILES:
+            data['image'] = save_uploaded_file(request.FILES['image_file'], 'doctors')
+            
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 # Appointments Endpoints
 class AppointmentListCreateAPIView(generics.ListCreateAPIView):
@@ -92,31 +139,81 @@ class AppointmentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
     queryset = Review.objects.all().order_by('-created_at')
     serializer_class = ReviewSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [permissions.AllowAny()]
         return [permissions.AllowAny()]
 
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        if 'image_file' in request.FILES:
+            data['image'] = save_uploaded_file(request.FILES['image_file'], 'reviews')
+        
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 class ReviewDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
-# Blogs Endpoints
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = request.data.copy()
+        
+        if 'image_file' in request.FILES:
+            data['image'] = save_uploaded_file(request.FILES['image_file'], 'reviews')
+            
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+# Blogs Endpoints with Image Upload support
 class BlogListCreateAPIView(generics.ListCreateAPIView):
     queryset = Blog.objects.all().order_by('-id')
     serializer_class = BlogSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
 
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        if 'image_file' in request.FILES:
+            data['image'] = save_uploaded_file(request.FILES['image_file'], 'blogs')
+        
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 class BlogDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = request.data.copy()
+        
+        if 'image_file' in request.FILES:
+            data['image'] = save_uploaded_file(request.FILES['image_file'], 'blogs')
+            
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 # Dashboard Analytics Statistics Endpoint
 class DashboardStatsAPIView(APIView):

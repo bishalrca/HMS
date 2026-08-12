@@ -1,51 +1,131 @@
-/* Admin Dashboard Styling - Matching HMS Brand Palette */
+/* Admin Dashboard Styling - Left Sidebar Layout & Med_Minus Brand Palette */
 
-.dashboard-header {
+body {
+    background-color: #f4f7f6;
+    margin: 0; padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Dashboard Shell Layout */
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Left Sidebar Styling */
+.sidebar {
+    width: 26rem;
     background: var(--green);
     color: #fff;
-    padding: 2rem 9%;
+    position: fixed;
+    top: 0; bottom: 0; left: 0;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: .4rem 0 1.5rem rgba(0, 0, 0, .1);
+    z-index: 1000;
+}
+
+.sidebar .brand {
+    font-size: 2.4rem;
+    color: #fff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 2.5rem;
+    border-bottom: .1rem solid rgba(255, 255, 255, .2);
+    margin-bottom: 2rem;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    flex: 1;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.2rem 1.6rem;
+    color: rgba(255, 255, 255, .9);
+    border-radius: .5rem;
+    font-size: 1.6rem;
+    font-weight: 500;
+    transition: all .2s ease-out;
+}
+
+.sidebar-nav a i {
+    font-size: 1.8rem;
+    width: 2.4rem;
+    text-align: center;
+}
+
+.sidebar-nav a.active,
+.sidebar-nav a:hover {
+    background: #fff;
+    color: var(--green);
+    font-weight: 600;
+    box-shadow: var(--box-shadow);
+}
+
+.sidebar-footer {
+    padding-top: 2rem;
+    border-top: .1rem solid rgba(255, 255, 255, .2);
+}
+
+.sidebar-footer .user-info {
+    font-size: 1.4rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+}
+
+.sidebar-footer .btn-logout {
+    width: 100%;
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 1rem;
+    border-radius: .5rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .8rem;
+    transition: background .2s ease;
+}
+
+.sidebar-footer .btn-logout:hover {
+    background: #c0392b;
+}
+
+/* Main Content Panel */
+.main-content {
+    margin-left: 26rem;
+    width: calc(100% - 26rem);
+    padding: 3.5rem 4rem;
+}
+
+.section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.1);
+    margin-bottom: 3rem;
 }
 
-.dashboard-header .brand {
-    font-size: 2.5rem;
-    color: #fff;
-    font-weight: 700;
-}
-
-.dashboard-header .brand i {
-    margin-right: .8rem;
-}
-
-.dashboard-nav {
-    display: flex;
-    gap: 1.5rem;
-}
-
-.dashboard-nav button {
-    background: transparent;
-    border: .2rem solid #fff;
-    color: #fff;
-    padding: .8rem 1.6rem;
-    font-size: 1.5rem;
-    border-radius: .5rem;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all .2s ease;
-}
-
-.dashboard-nav button.active,
-.dashboard-nav button:hover {
-    background: #fff;
-    color: var(--green);
-}
-
-.dashboard-container {
-    padding: 3rem 9%;
-    min-height: 80vh;
+.section-header h2 {
+    font-size: 3rem;
+    color: var(--black);
+    text-transform: uppercase;
+    letter-spacing: .1rem;
 }
 
 /* Overview Stat Cards */
@@ -84,29 +164,7 @@
     font-weight: 500;
 }
 
-/* Management Content Sections */
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.section-header h2 {
-    font-size: 3rem;
-    color: var(--black);
-    text-transform: uppercase;
-}
-
-/* Data Tables */
+/* Tables */
 .table-responsive {
     overflow-x: auto;
     background: #fff;
@@ -141,35 +199,7 @@
     background-color: #f9f9f9;
 }
 
-/* Status Badges */
-.badge {
-    display: inline-block;
-    padding: .4rem 1rem;
-    border-radius: 2rem;
-    font-size: 1.3rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.badge.pending {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-}
-
-.badge.confirmed {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.badge.cancelled {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-/* Action Buttons inside Dashboard */
+/* Action Buttons */
 .action-btn {
     padding: .6rem 1.2rem;
     font-size: 1.3rem;
@@ -178,6 +208,10 @@
     margin-right: .4rem;
     border: none;
     font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    text-decoration: none;
 }
 
 .btn-approve {
@@ -207,41 +241,59 @@
     background-color: #c0392b;
 }
 
-/* Modal Form styling */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,.6);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: .4rem 1rem;
+    border-radius: 2rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
-.modal.active {
-    display: flex;
+.badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
 }
 
-.modal-content {
+.badge.confirmed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.badge.cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Dedicated Admin Form Page Styling */
+.admin-form-card {
     background: #fff;
     border: var(--border);
     box-shadow: var(--box-shadow);
     border-radius: .5rem;
-    padding: 3rem;
-    width: 90%;
-    max-width: 50rem;
+    padding: 3.5rem;
+    max-width: 70rem;
+    margin: 0 auto;
 }
 
-.modal-content h3 {
-    font-size: 2.5rem;
-    color: var(--black);
+.admin-form-card .form-group {
     margin-bottom: 2rem;
-    text-align: center;
 }
 
-.modal-content .input-box {
+.admin-form-card label {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--black);
+    display: block;
+    margin-bottom: .8rem;
+}
+
+.admin-form-card .input-box {
     width: 100%;
-    margin-bottom: 1.5rem;
     border: var(--border);
     border-radius: .5rem;
     padding: 1.2rem;
@@ -249,19 +301,46 @@
     color: var(--black);
 }
 
-.modal-content .modal-actions {
+.admin-form-card .file-box {
+    width: 100%;
+    border: .2rem dashed var(--green);
+    border-radius: .5rem;
+    padding: 1.5rem;
+    background: #f9fdfc;
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+.form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+@media (max-width: 991px) {
+    .sidebar {
+        width: 20rem;
+    }
+    .main-content {
+        margin-left: 20rem;
+        width: calc(100% - 20rem);
+        padding: 2rem;
+    }
 }
 
 @media (max-width: 768px) {
-    .dashboard-header {
+    .dashboard-wrapper {
         flex-direction: column;
-        gap: 1.5rem;
     }
-    .dashboard-container {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+    .main-content {
+        margin-left: 0;
+        width: 100%;
         padding: 2rem;
     }
 }

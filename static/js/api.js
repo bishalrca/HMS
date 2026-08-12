@@ -128,14 +128,17 @@ class ApiService {
     }
 
     static async getCurrentUser() {
-        const local = sessionStorage.getItem('hms_auth_user');
-        if (local) return JSON.parse(local);
-
-        const data = await this.request('/auth/user/');
-        if (data && data.authenticated) {
-            sessionStorage.setItem('hms_auth_user', JSON.stringify(data.user));
-            return data.user;
+        try {
+            const data = await this.request('/auth/user/');
+            if (data && data.authenticated) {
+                sessionStorage.setItem('hms_auth_user', JSON.stringify(data.user));
+                return data.user;
+            }
+        } catch (e) {
+            console.warn('Backend session check failed:', e);
         }
+        
+        sessionStorage.removeItem('hms_auth_user');
         return null;
     }
 
@@ -163,6 +166,20 @@ class ApiService {
         const newDoc = { id: Date.now(), ...doctorData };
         MOCK_DATA.doctors.unshift(newDoc);
         return { success: true, data: newDoc };
+    }
+
+    static async updateDoctor(id, doctorData) {
+        const data = await this.request(`/doctors/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(doctorData)
+        });
+        if (data) return { success: true, data };
+
+        const index = MOCK_DATA.doctors.findIndex(d => d.id == id);
+        if (index !== -1) {
+            MOCK_DATA.doctors[index] = { ...MOCK_DATA.doctors[index], ...doctorData };
+        }
+        return { success: true, data: MOCK_DATA.doctors[index] };
     }
 
     static async deleteDoctor(id) {

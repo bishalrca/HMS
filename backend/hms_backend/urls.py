@@ -1,32 +1,56 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
-from django.views.generic import TemplateView
 from django.views.static import serve
 from django.conf import settings
 
-def serve_page(request, page_name):
-    template = page_name if page_name.endswith('.html') else f"{page_name}.html"
-    return TemplateView.as_view(template_name=template)(request)
+from .views import (
+    HomeView,
+    LoginView,
+    DashboardOverviewView,
+    DashboardAppointmentsView,
+    DashboardAppointmentEditView,
+    DashboardDoctorsView,
+    DashboardDoctorCreateView,
+    DashboardDoctorEditView,
+    DashboardBlogsView,
+    DashboardBlogCreateView,
+    DashboardBlogEditView,
+    DashboardReviewsView,
+    DashboardReviewEditView
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     
-    # Frontend Homepage
-    path('', TemplateView.as_view(template_name='index.html'), name='home'),
+    # Frontend Homepage & Auth
+    path('', HomeView.as_view(), name='home'),
+    path('login/', LoginView.as_view(), name='login'),
+
+    # Admin Dashboard Routes & Dedicated Create/Edit Pages
+    path('dashboard/', DashboardOverviewView.as_view(), name='dashboard-overview'),
+    path('dashboard/overview/', DashboardOverviewView.as_view(), name='dashboard-overview-alt'),
     
-    # Admin Login Route
-    path('login/', TemplateView.as_view(template_name='login.html'), name='login'),
-    path('login', TemplateView.as_view(template_name='login.html'), name='login-direct'),
+    # Appointments
+    path('dashboard/appointments/', DashboardAppointmentsView.as_view(), name='dashboard-appointments'),
+    path('dashboard/appointments/edit/<int:id>/', DashboardAppointmentEditView.as_view(), name='dashboard-appointment-edit'),
 
-    # Admin Dashboard Route
-    path('dashboard/', TemplateView.as_view(template_name='dashboard.html'), name='dashboard'),
-    path('dashboard', TemplateView.as_view(template_name='dashboard.html'), name='dashboard-direct'),
+    # Doctors
+    path('dashboard/doctors/', DashboardDoctorsView.as_view(), name='dashboard-doctors'),
+    path('dashboard/doctors/create/', DashboardDoctorCreateView.as_view(), name='dashboard-doctor-create'),
+    path('dashboard/doctors/edit/<int:id>/', DashboardDoctorEditView.as_view(), name='dashboard-doctor-edit'),
 
-    # Sub-pages inside pages/ directory
-    path('pages/<str:page_name>', serve_page, name='pages'),
+    # Blogs
+    path('dashboard/blogs/', DashboardBlogsView.as_view(), name='dashboard-blogs'),
+    path('dashboard/blogs/create/', DashboardBlogCreateView.as_view(), name='dashboard-blog-create'),
+    path('dashboard/blogs/edit/<int:id>/', DashboardBlogEditView.as_view(), name='dashboard-blog-edit'),
 
-    # Static Assets & Images serving for development server
+    # Reviews
+    path('dashboard/reviews/', DashboardReviewsView.as_view(), name='dashboard-reviews'),
+    path('dashboard/reviews/edit/<int:id>/', DashboardReviewEditView.as_view(), name='dashboard-review-edit'),
+
+    # Static Assets, Uploaded Media & Images serving
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^image/(?P<path>.*)$', serve, {'document_root': settings.BASE_DIR.parent / 'image'}),
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.BASE_DIR.parent / 'static'}),
 ]

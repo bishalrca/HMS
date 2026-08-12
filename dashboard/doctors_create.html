@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Doctor - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <div>
+            <a href="/" class="brand"> <i class="fas fa-heartbeat"></i> <span>Med_Minus</span> </a>
+            <nav class="sidebar-nav">
+                <a href="/dashboard/overview/"><i class="fas fa-chart-line"></i> Overview</a>
+                <a href="/dashboard/appointments/"><i class="fas fa-calendar-check"></i> Appointments</a>
+                <a href="/dashboard/doctors/" class="active"><i class="fas fa-user-md"></i> Doctors</a>
+                <a href="/dashboard/blogs/"><i class="fas fa-blog"></i> Blogs</a>
+                <a href="/dashboard/reviews/"><i class="fas fa-star"></i> Reviews</a>
+            </nav>
+        </div>
+        <div class="sidebar-footer">
+            <button onclick="handleLogout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="section-header">
+            <h2>Add New Doctor Profile</h2>
+            <a href="/dashboard/doctors/" class="action-btn btn-cancel"><i class="fas fa-arrow-left"></i> Back to Doctors</a>
+        </div>
+
+        <div class="admin-form-card">
+            <form id="doctor-create-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Doctor Full Name:</label>
+                    <input type="text" id="doc-name" name="name" placeholder="e.g. Dr. Priya Sharma" class="input-box" required>
+                </div>
+                <div class="form-group">
+                    <label>Specialty / Specialization Name:</label>
+                    <input type="text" id="doc-specialty" name="specialty" placeholder="e.g. CARDIOLOGIST" class="input-box" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Profile Photo (File Upload):</label>
+                    <input type="file" id="doc-image-file" name="image_file" accept="image/*" class="file-box">
+                </div>
+                <div class="form-group">
+                    <label>Or Photo Asset Path / URL:</label>
+                    <input type="text" id="doc-image" name="image" placeholder="e.g. /image/doc-1.jpg" class="input-box" value="/image/doc-1.jpg">
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp Number:</label>
+                    <input type="text" id="doc-whatsapp" name="whatsapp" placeholder="e.g. +9779841234567" class="input-box">
+                </div>
+                <div class="form-group">
+                    <label>LinkedIn Profile URL:</label>
+                    <input type="text" id="doc-linkedin" name="linkedin" placeholder="https://linkedin.com/in/doctor" class="input-box">
+                </div>
+
+                <div class="form-actions">
+                    <a href="/dashboard/doctors/" class="action-btn btn-cancel">Cancel</a>
+                    <button type="submit" class="action-btn btn-approve">Save Doctor Profile</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script src="/static/js/api.js?v=1.4"></script>
+<script src="/static/js/dashboard.js?v=1.4"></script>
+<script src="/static/js/dashboard_forms.js?v=1.4"></script>
+</body>
+</html>

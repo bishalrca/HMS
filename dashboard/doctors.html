@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Doctors | Med_Minus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <div>
+            <a href="/" class="brand"> <i class="fas fa-heartbeat"></i> <span>Med_Minus</span> </a>
+            <nav class="sidebar-nav">
+                <a href="/dashboard/overview/"><i class="fas fa-chart-line"></i> Overview</a>
+                <a href="/dashboard/appointments/"><i class="fas fa-calendar-check"></i> Appointments</a>
+                <a href="/dashboard/doctors/" class="active"><i class="fas fa-user-md"></i> Doctors</a>
+                <a href="/dashboard/blogs/"><i class="fas fa-blog"></i> Blogs</a>
+                <a href="/dashboard/reviews/"><i class="fas fa-star"></i> Reviews</a>
+            </nav>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-info"><i class="fas fa-user-circle"></i> Admin: <strong id="admin-username">Admin</strong></div>
+            <button onclick="handleLogout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            <a href="/" style="display: block; text-align: center; color: rgba(255,255,255,.8); margin-top: 1rem; font-size: 1.3rem;"><i class="fas fa-globe"></i> Main Hospital Site</a>
+        </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="main-content">
+        <div class="section-header">
+            <h2>Manage Doctors List</h2>
+            <a href="/dashboard/doctors/create/" class="btn"><i class="fas fa-plus"></i> Add New Doctor</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Photo</th>
+                        <th>Doctor Name</th>
+                        <th>Specialty</th>
+                        <th>WhatsApp</th>
+                        <th>LinkedIn</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="doctors-tbody">
+                    <!-- Populated by /static/js/dashboard.js -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script src="/static/js/api.js?v=1.4"></script>
+<script src="/static/js/dashboard.js?v=1.4"></script>
+</body>
+</html>

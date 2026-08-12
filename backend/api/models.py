@@ -4,6 +4,7 @@ class Doctor(models.Model):
     name = models.CharField(max_length=150)
     specialty = models.CharField(max_length=100)
     image = models.CharField(max_length=255, default='image/doc-1.jpg')
+    whatsapp = models.CharField(max_length=50, blank=True, default='#')
     facebook = models.URLField(blank=True, default='#')
     twitter = models.URLField(blank=True, default='#')
     instagram = models.URLField(blank=True, default='#')

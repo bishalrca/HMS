@@ -13,15 +13,15 @@ def seed():
 
     # Seed Doctors
     doctors_data = [
-        { "name": "Dr. Priya Sharma", "specialty": "CARDIOLOGIST", "image": "image/doc-1.jpg" },
-        { "name": "Dr. Arvind Kumar", "specialty": "GENERAL SURGEON", "image": "image/doc-2.jpg" },
-        { "name": "Dr. Ayesha Khan", "specialty": "PEDIATRICIAN", "image": "image/doc-3.jpg" },
-        { "name": "Dr. Anjali Desai", "specialty": "GYNECOLOGIST", "image": "image/doc-4.jpg" },
-        { "name": "Dr. Rajesh Patel", "specialty": "NEUROLOGIST", "image": "image/doc-5.jpg" },
-        { "name": "Dr. Suresh Menon", "specialty": "DERMATOLOGIST", "image": "image/doc-6.jpg" },
-        { "name": "Dr. Meera Reddy", "specialty": "ORTHOPEDIC SURGEON", "image": "image/doc-7.jpg" },
-        { "name": "Dr. Vikram Menon", "specialty": "ORTHOPEDIC SURGEON", "image": "image/doc-8.jpg" },
-        { "name": "Dr. Ravi Verma", "specialty": "UROLOGIST", "image": "image/doc-9.jpg" }
+        { "name": "Dr. Priya Sharma", "specialty": "CARDIOLOGIST", "image": "image/doc-1.jpg", "whatsapp": "+9779841234567", "linkedin": "#" },
+        { "name": "Dr. Arvind Kumar", "specialty": "GENERAL SURGEON", "image": "image/doc-2.jpg", "whatsapp": "+9779801234567", "linkedin": "#" },
+        { "name": "Dr. Ayesha Khan", "specialty": "PEDIATRICIAN", "image": "image/doc-3.jpg", "whatsapp": "+9779811234567", "linkedin": "#" },
+        { "name": "Dr. Anjali Desai", "specialty": "GYNECOLOGIST", "image": "image/doc-4.jpg", "whatsapp": "+9779821234567", "linkedin": "#" },
+        { "name": "Dr. Rajesh Patel", "specialty": "NEUROLOGIST", "image": "image/doc-5.jpg", "whatsapp": "+9779831234567", "linkedin": "#" },
+        { "name": "Dr. Suresh Menon", "specialty": "DERMATOLOGIST", "image": "image/doc-6.jpg", "whatsapp": "+9779851234567", "linkedin": "#" },
+        { "name": "Dr. Meera Reddy", "specialty": "ORTHOPEDIC SURGEON", "image": "image/doc-7.jpg", "whatsapp": "+9779861234567", "linkedin": "#" },
+        { "name": "Dr. Vikram Menon", "specialty": "ORTHOPEDIC SURGEON", "image": "image/doc-8.jpg", "whatsapp": "+9779871234567", "linkedin": "#" },
+        { "name": "Dr. Ravi Verma", "specialty": "UROLOGIST", "image": "image/doc-9.jpg", "whatsapp": "+9779881234567", "linkedin": "#" }
     ]
 
     for doc in doctors_data:
