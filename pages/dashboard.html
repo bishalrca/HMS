@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Hospital Management System</title>
+    
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Absolute Root Paths for Modular CSS -->
+    <link rel="stylesheet" href="/static/css/global.css">
+    <link rel="stylesheet" href="/static/css/header.css">
+    <link rel="stylesheet" href="/static/css/doctors.css">
+    <link rel="stylesheet" href="/static/css/review.css">
+    <link rel="stylesheet" href="/static/css/blogs.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+
+<header class="dashboard-header">
+    <a href="/" class="brand"> <i class="fas fa-heartbeat"></i> <strong>Med_Minus</strong> | Admin Portal</a>
+    
+    <nav class="dashboard-nav">
+        <button data-tab="overview" class="active"><i class="fas fa-chart-line"></i> Overview</button>
+        <button data-tab="appointments"><i class="fas fa-calendar-check"></i> Appointments</button>
+        <button data-tab="doctors"><i class="fas fa-user-md"></i> Doctors</button>
+        <button data-tab="blogs"><i class="fas fa-blog"></i> Blogs</button>
+        <button data-tab="reviews"><i class="fas fa-star"></i> Reviews</button>
+        <span style="color: #fff; font-size: 1.4rem; align-self: center; margin-left: 1rem;"><i class="fas fa-user"></i> <strong id="admin-username">Admin</strong></span>
+        <button onclick="handleLogout()" style="background: #e74c3c; color: #fff; border: none; padding: .6rem 1.2rem; font-size: 1.4rem; border-radius: .4rem; cursor: pointer;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </nav>
+</header>
+
+<div class="dashboard-container">
+    
+    <!-- Tab 1: Overview & Stats -->
+    <div id="tab-overview" class="tab-content active">
+        <div class="section-header">
+            <h2>Hospital Analytics Overview</h2>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-user-md"></i>
+                <h3 id="stat-doctors">0</h3>
+                <p>Active Doctors</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar-alt"></i>
+                <h3 id="stat-appointments">0</h3>
+                <p>Total Appointments</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <h3 id="stat-pending">0</h3>
+                <p>Pending Approvals</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <h3 id="stat-confirmed">0</h3>
+                <p>Confirmed Appointments</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Appointments Management -->
+    <div id="tab-appointments" class="tab-content">
+        <div class="section-header">
+            <h2>Manage Patient Appointments</h2>
+        </div>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient Name</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="appointments-tbody">
+                    <!-- Populated by /static/js/dashboard.js -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab 3: Doctors Management -->
+    <div id="tab-doctors" class="tab-content">
+        <div class="section-header">
+            <h2>Manage Doctors List</h2>
+            <button class="btn" onclick="openModal('doctor-modal')"><i class="fas fa-plus"></i> Add New Doctor</button>
+        </div>
+
+        <section class="doctors" style="padding: 0;">
+            <div class="box-container" id="admin-doctors-container">
+                <!-- Populated by /static/js/dashboard.js -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Tab 4: Blogs Management -->
+    <div id="tab-blogs" class="tab-content">
+        <div class="section-header">
+            <h2>Manage Health Articles & Blogs</h2>
+            <button class="btn" onclick="openModal('blog-modal')"><i class="fas fa-plus"></i> Write New Article</button>
+        </div>
+
+        <section class="blogs" style="padding: 0;">
+            <div class="box-container" id="admin-blogs-container">
+                <!-- Populated by /static/js/dashboard.js -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Tab 5: Reviews Management -->
+    <div id="tab-reviews" class="tab-content">
+        <div class="section-header">
+            <h2>Manage Patient Reviews</h2>
+        </div>
+
+        <section class="review" style="padding: 0;">
+            <div class="box-container" id="admin-reviews-container">
+                <!-- Populated by /static/js/dashboard.js -->
+            </div>
+        </section>
+    </div>
+
+</div>
+
+<!-- Modal: Add New Doctor -->
+<div id="doctor-modal" class="modal">
+    <div class="modal-content">
+        <h3>Add New Doctor Profile</h3>
+        <form id="add-doctor-form">
+            <input type="text" id="doc-name" placeholder="Doctor Name (e.g. Dr. Priya Sharma)" class="input-box" required>
+            <input type="text" id="doc-specialty" placeholder="Specialty (e.g. CARDIOLOGIST)" class="input-box" required>
+            <input type="text" id="doc-image" placeholder="Image Path (e.g. /image/doc-1.jpg)" class="input-box" value="/image/doc-1.jpg">
+            <div class="modal-actions">
+                <button type="button" class="action-btn btn-cancel" onclick="closeModal('doctor-modal')">Cancel</button>
+                <button type="submit" class="action-btn btn-approve">Save Doctor</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Add New Blog Article -->
+<div id="blog-modal" class="modal">
+    <div class="modal-content">
+        <h3>Publish New Health Blog Article</h3>
+        <form id="add-blog-form">
+            <input type="text" id="blog-title" placeholder="Blog Title" class="input-box" required>
+            <input type="text" id="blog-author" placeholder="Author Name (e.g. Dr. Sarah Lee)" class="input-box" required>
+            <input type="text" id="blog-date" placeholder="Publish Date (e.g. 15 August, 2026)" class="input-box" required>
+            <input type="text" id="blog-image" placeholder="Image Path (e.g. /image/blog-1.jpg)" class="input-box" value="/image/blog-1.jpg">
+            <textarea id="blog-summary" placeholder="Summary Content..." class="input-box" style="height: 10rem;" required></textarea>
+            <div class="modal-actions">
+                <button type="button" class="action-btn btn-cancel" onclick="closeModal('blog-modal')">Cancel</button>
+                <button type="submit" class="action-btn btn-approve">Publish Article</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Absolute JS Script Links -->
+<script src="/static/js/api.js"></script>
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>

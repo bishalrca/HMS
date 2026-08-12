@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Doctors - Hospital Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Modular CSS -->
+    <link rel="stylesheet" href="/static/css/global.css">
+    <link rel="stylesheet" href="/static/css/header.css">
+    <link rel="stylesheet" href="/static/css/doctors.css">
+    <link rel="stylesheet" href="/static/css/footer.css">
+</head>
+<body>
+
+<header class="header">
+    <a href="/" class="logo"> <i class="fas fa-heartbeat"></i> <strong>Med_Minus</strong></a>
+    <nav class="navbar">
+        <a href="/">home</a>
+        <a href="/pages/about.html">about</a>
+        <a href="/pages/services.html">services</a>
+        <a href="/pages/doctors.html" class="active">doctors</a>
+        <a href="/pages/appointment.html">appointment</a>
+        <a href="/pages/reviews.html">review</a>
+        <a href="/pages/blogs.html">blogs</a>
+    </nav>
+    <div id="menu-btn" class="fas fa-bars"></div>
+</header>
+
+<div style="height: 10rem;"></div>
+
+<section class="doctors" id="doctors">
+    <h1 class="heading"> our <span>doctors</span> </h1>
+    <div class="box-container" id="doctors-container">
+        <!-- Rendered asynchronously by doctors.js -->
+    </div>
+</section>
+
+<section class="footer">
+    <div class="credit"> created by <span>Sameeha</span> | all rights reserved </div>
+</section>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+<script src="/static/js/doctors.js"></script>
+
+</body>
+</html>

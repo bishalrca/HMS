@@ -1,0 +1,11 @@
+/* Master Stylesheet importing modular CSS files */
+@import url('global.css');
+@import url('header.css');
+@import url('home.css');
+@import url('about.css');
+@import url('services.css');
+@import url('doctors.css');
+@import url('appointment.css');
+@import url('review.css');
+@import url('blogs.css');
+@import url('footer.css');
