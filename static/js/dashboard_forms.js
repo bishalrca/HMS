@@ -1,6 +1,21 @@
 /**
- * Admin Forms Handler - Handles dedicated Create and Edit pages with Image Uploads
+ * Admin Forms Handler - Handles dedicated Create and Edit pages with Image Uploads and CSRF Protection
  */
+
+function getCsrfToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === ('csrftoken=')) {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue || '';
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Doctor Create Form
@@ -17,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch('/api/doctors/', {
                     method: 'POST',
+                    headers: { 'X-CSRFToken': getCsrfToken() },
                     body: formData
                 });
                 
@@ -24,14 +40,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     window.location.href = '/dashboard/doctors/';
                 } else {
                     const err = await response.json();
-                    alert(err.detail || 'Failed to create doctor.');
+                    alert(err.detail || err.error || 'Failed to create doctor.');
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Save Doctor';
+                    submitBtn.textContent = 'Save Doctor Profile';
                 }
             } catch (err) {
                 alert('Connection error while creating doctor.');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Save Doctor';
+                submitBtn.textContent = 'Save Doctor Profile';
             }
         });
     }
@@ -53,6 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch(`/api/doctors/${docId}/`, {
                     method: 'PATCH',
+                    headers: { 'X-CSRFToken': getCsrfToken() },
                     body: formData
                 });
                 
@@ -60,14 +77,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     window.location.href = '/dashboard/doctors/';
                 } else {
                     const err = await response.json();
-                    alert(err.detail || 'Failed to update doctor.');
+                    alert(err.detail || err.error || 'Failed to update doctor.');
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Update Doctor';
+                    submitBtn.textContent = 'Update Doctor Profile';
                 }
             } catch (err) {
                 alert('Connection error while updating doctor.');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Update Doctor';
+                submitBtn.textContent = 'Update Doctor Profile';
             }
         });
     }
@@ -86,6 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch('/api/blogs/', {
                     method: 'POST',
+                    headers: { 'X-CSRFToken': getCsrfToken() },
                     body: formData
                 });
 
@@ -93,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     window.location.href = '/dashboard/blogs/';
                 } else {
                     const err = await response.json();
-                    alert(err.detail || 'Failed to publish blog.');
+                    alert(err.detail || err.error || 'Failed to publish blog.');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Publish Article';
                 }
@@ -122,6 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch(`/api/blogs/${blogId}/`, {
                     method: 'PATCH',
+                    headers: { 'X-CSRFToken': getCsrfToken() },
                     body: formData
                 });
 
@@ -129,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     window.location.href = '/dashboard/blogs/';
                 } else {
                     const err = await response.json();
-                    alert(err.detail || 'Failed to update blog.');
+                    alert(err.detail || err.error || 'Failed to update blog.');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Update Article';
                 }
