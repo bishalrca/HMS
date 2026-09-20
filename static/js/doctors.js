@@ -20,25 +20,25 @@ function renderDoctors(doctors, container) {
         return;
     }
 
-    container.innerHTML = doctors.map(doc => `
+    container.innerHTML = doctors.map(doc => {
+        const rawImg = doc.image || 'image/doc-1.jpg';
+        const imgSrc = (rawImg.startsWith('/') || rawImg.startsWith('http')) ? rawImg : '/' + rawImg;
+        return `
         <div class="box">
-            <img src="${doc.image || '/image/doc-1.jpg'}" alt="${escapeHtml(doc.name)}">
+            <img src="${imgSrc}" alt="${escapeHtml(doc.name)}">
             <h3>${escapeHtml(doc.name)}</h3>
             <span>${escapeHtml(doc.specialty || doc.specialization || 'SPECIALIST')}</span>
             <div class="share">
                 ${doc.whatsapp ? `<a href="https://wa.me/${escapeHtml(doc.whatsapp.replace(/[^0-9]/g, ''))}" target="_blank" class="fab fa-whatsapp" title="WhatsApp"></a>` : ''}
                 ${doc.linkedin ? `<a href="${escapeHtml(doc.linkedin)}" target="_blank" class="fab fa-linkedin" title="LinkedIn"></a>` : ''}
-                ${doc.facebook ? `<a href="${escapeHtml(doc.facebook)}" class="fab fa-facebook-f"></a>` : ''}
-                ${doc.twitter ? `<a href="${escapeHtml(doc.twitter)}" class="fab fa-twitter"></a>` : ''}
-                ${doc.instagram ? `<a href="${escapeHtml(doc.instagram)}" class="fab fa-instagram"></a>` : ''}
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function escapeHtml(str) {
     if (!str) return '';
-    return str.replace(/[&<>"']/g, function(m) {
+    return str.replace(/[&<>"']/g, function (m) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
     });
 }

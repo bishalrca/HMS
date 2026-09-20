@@ -20,10 +20,13 @@ function renderBlogs(blogs, container) {
         return;
     }
 
-    container.innerHTML = blogs.map(blog => `
+    container.innerHTML = blogs.map(blog => {
+        const rawImg = blog.image || 'image/blog-1.jpg';
+        const imgSrc = (rawImg.startsWith('/') || rawImg.startsWith('http')) ? rawImg : '/' + rawImg;
+        return `
         <div class="box">
             <div class="image">
-                <img src="${blog.image || 'image/blog-1.jpg'}" alt="${blog.title}">
+                <img src="${imgSrc}" alt="${blog.title}">
             </div>
             <div class="content">
                 <div class="icon">
@@ -35,5 +38,5 @@ function renderBlogs(blogs, container) {
                 <a href="#" class="btn"> learn more <span class="fas fa-chevron-right"></span> </a>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }

@@ -24,7 +24,7 @@
             </nav>
         </div>
         <div class="sidebar-footer">
-            <div class="user-info"><i class="fas fa-user-circle"></i> Admin: <strong id="admin-username">Admin</strong></div>
+            <div class="user-info"><i class="fas fa-user-circle"></i> <span id="user-role-label">User</span>: <strong id="admin-username">User</strong></div>
             <button onclick="handleLogout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
             <a href="/" style="display: block; text-align: center; color: rgba(255,255,255,.8); margin-top: 1rem; font-size: 1.3rem;"><i class="fas fa-globe"></i> Main Hospital Site</a>
         </div>
@@ -32,8 +32,20 @@
 
     <!-- Main Content Panel -->
     <main class="main-content">
-        <div class="section-header">
+        <div class="section-header" id="appointments-section-header">
             <h2>Manage Patient Appointments</h2>
+        </div>
+
+        <!-- Available Doctors Grid for Patient Booking -->
+        <div id="patient-doctor-booking-container" style="display: none; margin-bottom: 3.5rem;">
+            <div style="margin-bottom: 1.8rem; border-bottom: 2px solid #eef9f6; padding-bottom: 1rem;">
+                <h3 style="font-size: 2.2rem; color: var(--black); margin-bottom: .4rem;"><i class="fas fa-user-md" style="color: var(--green); margin-right: .8rem;"></i> Available Doctors</h3>
+                <p style="font-size: 1.4rem; color: #666;">Choose a doctor below to book your appointment instantly.</p>
+            </div>
+            
+            <div id="patient-doctors-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(26rem, 1fr)); gap: 2rem;">
+                <!-- Populated dynamically by dashboard.js -->
+            </div>
         </div>
 
         <div class="table-responsive">

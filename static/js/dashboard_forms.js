@@ -92,13 +92,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Blog Create Form
     const blogCreateForm = document.getElementById('blog-create-form');
     if (blogCreateForm) {
+        const dateInput = document.getElementById('blog-date');
+        const authorInput = document.getElementById('blog-author');
+        if (dateInput && !dateInput.value) {
+            const today = new Date();
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            dateInput.value = today.toLocaleDateString('en-GB', options);
+        }
+
         blogCreateForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(blogCreateForm);
 
             const submitBtn = blogCreateForm.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Publishing Article...';
+            submitBtn.textContent = 'Submitting Article...';
 
             try {
                 const response = await fetch('/api/blogs/', {
@@ -108,17 +116,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 'PENDING') {
+                        alert('Blog article submitted successfully! It is currently pending approval by Admin.');
+                    } else {
+                        alert('Blog article published successfully!');
+                    }
                     window.location.href = '/dashboard/blogs/';
                 } else {
                     const err = await response.json();
-                    alert(err.detail || err.error || 'Failed to publish blog.');
+                    alert(err.detail || err.error || 'Failed to submit blog.');
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Publish Article';
+                    submitBtn.textContent = 'Submit Article';
                 }
             } catch (err) {
-                alert('Connection error while creating blog.');
+                alert('Connection error while submitting blog.');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Publish Article';
+                submitBtn.textContent = 'Submit Article';
             }
         });
     }
@@ -169,18 +183,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         appointmentEditForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const payload = {
-                name: document.getElementById('appt-name').value,
-                number: document.getElementById('appt-number').value,
-                email: document.getElementById('appt-email').value,
+                name: document.getElementById('appt-name').value.trim(),
+                number: document.getElementById('appt-number').value.trim(),
+                email: document.getElementById('appt-email').value.trim(),
                 date: document.getElementById('appt-date').value,
                 status: document.getElementById('appt-status').value
             };
 
             const submitBtn = appointmentEditForm.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
+            submitBtn.textContent = 'Updating Appointment...';
 
-            const res = await window.ApiService.updateAppointmentStatus(apptId, payload.status);
-            window.location.href = '/dashboard/appointments/';
+            try {
+                const res = await window.ApiService.updateAppointment(apptId, payload);
+                if (res.success) {
+                    window.location.href = '/dashboard/appointments/';
+                } else {
+                    alert(res.error || 'Failed to update appointment.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Update Appointment';
+                }
+            } catch (err) {
+                alert('Connection error while updating appointment.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Update Appointment';
+            }
         });
     }
 });
@@ -220,9 +247,8 @@ async function loadBlogEditData(id) {
 
 async function loadAppointmentEditData(id) {
     try {
-        const res = await fetch(`/api/appointments/${id}/`);
-        if (res.ok) {
-            const data = await res.json();
+        const data = await window.ApiService.request(`/appointments/${id}/`);
+        if (data) {
             document.getElementById('appt-name').value = data.name || '';
             document.getElementById('appt-number').value = data.number || '';
             document.getElementById('appt-email').value = data.email || '';

@@ -20,16 +20,19 @@ function renderReviews(reviews, container) {
         return;
     }
 
-    container.innerHTML = reviews.map(rev => `
+    container.innerHTML = reviews.map(rev => {
+        const rawImg = rev.image || 'image/pic-1.jpg';
+        const imgSrc = (rawImg.startsWith('/') || rawImg.startsWith('http')) ? rawImg : '/' + rawImg;
+        return `
         <div class="box">
-            <img src="${rev.image || 'image/pic-1.jpg'}" alt="${rev.name}">
+            <img src="${imgSrc}" alt="${rev.name}">
             <h3>${rev.name}</h3>
             <div class="stars">
                 ${generateStars(rev.rating || 5)}
             </div>
             <p class="text">${rev.text}</p>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function generateStars(rating) {

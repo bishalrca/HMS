@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Hospital Management System</title>
+    
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Modular CSS -->
+    <link rel="stylesheet" href="/static/css/global.css?v=1.3">
+    <link rel="stylesheet" href="/static/css/header.css?v=1.3">
+    
+    <style>
+        body {
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+        }
+
+        .signup-card {
+            background: #fff;
+            border: var(--border);
+            box-shadow: var(--box-shadow);
+            border-radius: .5rem;
+            width: 100%;
+            max-width: 48rem;
+            padding: 3.5rem;
+            text-align: center;
+        }
+
+        .signup-card .logo {
+            font-size: 3rem;
+            color: var(--black);
+            margin-bottom: .5rem;
+            display: block;
+        }
+
+        .signup-card .logo i {
+            color: var(--green);
+        }
+
+        .signup-card h2 {
+            font-size: 2rem;
+            color: var(--light-color);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .signup-card .box {
+            width: 100%;
+            margin: 0.5rem 0 0.2rem 0;
+            border-radius: .5rem;
+            border: var(--border);
+            font-size: 1.5rem;
+            color: var(--black);
+            text-transform: none;
+            padding: 1.1rem 1.4rem;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+
+        .signup-card .box.is-invalid {
+            border-color: #e74c3c !important;
+            background-color: #fdf2f2;
+        }
+
+        .field-error {
+            display: block;
+            text-align: left;
+            color: #e74c3c;
+            font-size: 1.2rem;
+            margin-bottom: 0.6rem;
+            font-weight: 500;
+            min-height: 1.6rem;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 1.5rem;
+            margin: 1rem 0 1.5rem 0;
+            justify-content: center;
+        }
+
+        .role-option {
+            flex: 1;
+            padding: 1rem;
+            border: var(--border);
+            border-radius: .5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--black);
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .role-option input[type="radio"] {
+            display: none;
+        }
+
+        .role-option.active {
+            background: var(--green);
+            color: #fff;
+            border-color: var(--green);
+        }
+
+        .signup-card .btn {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            font-size: 1.8rem;
+            text-align: center;
+            font-weight: 600;
+            background: var(--green);
+            color: #fff;
+            cursor: pointer;
+            border-radius: .5rem;
+        }
+
+        .signup-card .btn:hover {
+            background: #117a65;
+        }
+
+        .alert-box {
+            display: none;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border-radius: .5rem;
+            font-size: 1.4rem;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .alert-box.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-box.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .role-info-badge {
+            font-size: 1.3rem;
+            color: var(--light-color);
+            margin-bottom: 1rem;
+            padding: 0.6rem;
+            background: #eef9f6;
+            border-radius: 0.4rem;
+            border-left: 3px solid var(--green);
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="signup-card">
+    <a href="/" class="logo"> <i class="fas fa-heartbeat"></i> <strong>Med_Minus</strong></a>
+    <h2>Create Your Account</h2>
+
+    <div id="alert-message" class="alert-box"></div>
+
+    <form id="signup-form" action="#" method="post" novalidate>
+        <label style="font-size: 1.4rem; font-weight: 600; color: var(--black); display: block; text-align: left; margin-bottom: 0.4rem;">Select Account Role:</label>
+        <div class="role-selector">
+            <label class="role-option active" id="role-patient-label">
+                <input type="radio" name="role" value="PATIENT" checked>
+                <i class="fas fa-user"></i> Patient
+            </label>
+            <label class="role-option" id="role-doctor-label">
+                <input type="radio" name="role" value="DOCTOR">
+                <i class="fas fa-user-md"></i> Doctor
+            </label>
+        </div>
+
+        <div id="role-info" class="role-info-badge">
+            <i class="fas fa-info-circle"></i> Registering as <strong>Patient</strong>: Manage appointments and health records.
+        </div>
+
+        <div>
+            <input type="text" id="username" name="username" placeholder="Username *" class="box" autocomplete="username">
+            <span class="field-error" id="err-username"></span>
+        </div>
+
+        <div>
+            <input type="email" id="email" name="email" placeholder="Email Address *" class="box" autocomplete="email">
+            <span class="field-error" id="err-email"></span>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <div style="flex: 1;">
+                <input type="text" id="first_name" name="first_name" placeholder="First Name" class="box">
+                <span class="field-error" id="err-first_name"></span>
+            </div>
+            <div style="flex: 1;">
+                <input type="text" id="last_name" name="last_name" placeholder="Last Name" class="box">
+                <span class="field-error" id="err-last_name"></span>
+            </div>
+        </div>
+
+        <div>
+            <input type="text" id="phone" name="phone" placeholder="Phone Number" class="box" autocomplete="tel">
+            <span class="field-error" id="err-phone"></span>
+        </div>
+
+        <div id="doctor-specialty-container" style="display: none;">
+            <select id="specialty" name="specialty" class="box">
+                <option value="">Select Medical Specialty *</option>
+                <option value="General Medicine">General Medicine</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Dermatology">Dermatology</option>
+                <option value="Surgery">Surgery</option>
+                <option value="Gynecology">Gynecology</option>
+                <option value="ENT Specialist">ENT Specialist</option>
+                <option value="Psychiatry">Psychiatry</option>
+            </select>
+            <span class="field-error" id="err-specialty"></span>
+        </div>
+
+        <div>
+            <input type="password" id="password" name="password" placeholder="Password (Min. 6 characters) *" class="box" autocomplete="new-password">
+            <span class="field-error" id="err-password"></span>
+        </div>
+
+        <button type="submit" id="signup-btn" class="btn">Register Account <span class="fas fa-user-plus"></span></button>
+    </form>
+
+    <div style="margin-top: 2rem; font-size: 1.4rem;">
+        Already have an account? <a href="/login/" style="color: var(--green); font-weight: 600;">Sign In Here</a>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+        <a href="/" style="font-size: 1.4rem; color: var(--green);"><i class="fas fa-arrow-left"></i> Return to Main Hospital Site</a>
+    </div>
+</div>
+
+<script src="/static/js/api.js?v=1.3"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('signup-form');
+        const alertBox = document.getElementById('alert-message');
+        const signupBtn = document.getElementById('signup-btn');
+        const rolePatient = document.getElementById('role-patient-label');
+        const roleDoctor = document.getElementById('role-doctor-label');
+        const roleInfo = document.getElementById('role-info');
+        const doctorSpecialtyContainer = document.getElementById('doctor-specialty-container');
+
+        const firstNameInput = document.getElementById('first_name');
+        const lastNameInput = document.getElementById('last_name');
+        const phoneInput = document.getElementById('phone');
+
+        let currentRole = 'PATIENT';
+
+        if (rolePatient && roleDoctor) {
+            rolePatient.addEventListener('click', () => {
+                currentRole = 'PATIENT';
+                rolePatient.classList.add('active');
+                roleDoctor.classList.remove('active');
+                rolePatient.querySelector('input').checked = true;
+                
+                doctorSpecialtyContainer.style.display = 'none';
+                firstNameInput.placeholder = 'First Name';
+                lastNameInput.placeholder = 'Last Name';
+                phoneInput.placeholder = 'Phone Number';
+                roleInfo.innerHTML = '<i class="fas fa-info-circle"></i> Registering as <strong>Patient</strong>: Manage appointments and health records.';
+                clearAllErrors();
+            });
+
+            roleDoctor.addEventListener('click', () => {
+                currentRole = 'DOCTOR';
+                roleDoctor.classList.add('active');
+                rolePatient.classList.remove('active');
+                roleDoctor.querySelector('input').checked = true;
+                
+                doctorSpecialtyContainer.style.display = 'block';
+                firstNameInput.placeholder = 'First Name *';
+                lastNameInput.placeholder = 'Last Name *';
+                phoneInput.placeholder = 'Phone Number *';
+                roleInfo.innerHTML = '<i class="fas fa-user-md"></i> Registering as <strong>Doctor</strong>: Medical portal access & patient schedule.';
+                clearAllErrors();
+            });
+        }
+
+        // Live validation listeners to clear errors on typing
+        const fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'specialty', 'password'];
+        fields.forEach(fId => {
+            const input = document.getElementById(fId);
+            if (input) {
+                input.addEventListener('input', () => clearFieldError(fId));
+            }
+        });
+
+        if (!form) return;
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAllErrors();
+
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const first_name = document.getElementById('first_name').value.trim();
+            const last_name = document.getElementById('last_name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const specialty = document.getElementById('specialty').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const role = document.querySelector('input[name="role"]:checked').value;
+
+            let isValid = true;
+
+            // Username Validation
+            if (!username) {
+                showFieldError('username', 'Username is required.');
+                isValid = false;
+            } else if (username.length < 3) {
+                showFieldError('username', 'Username must be at least 3 characters.');
+                isValid = false;
+            } else if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+                showFieldError('username', 'Only letters, numbers, hyphens, and underscores allowed.');
+                isValid = false;
+            }
+
+            // Email Validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                showFieldError('email', 'Email address is required.');
+                isValid = false;
+            } else if (!emailPattern.test(email)) {
+                showFieldError('email', 'Please enter a valid email address.');
+                isValid = false;
+            }
+
+            // Password Validation
+            if (!password) {
+                showFieldError('password', 'Password is required.');
+                isValid = false;
+            } else if (password.length < 6) {
+                showFieldError('password', 'Password must be at least 6 characters.');
+                isValid = false;
+            }
+
+            // Phone Validation
+            const phoneClean = phone.replace(/[^0-9]/g, '');
+            if (role === 'DOCTOR' && !phone) {
+                showFieldError('phone', 'Phone number is required for Doctor accounts.');
+                isValid = false;
+            } else if (phone && phoneClean.length < 7) {
+                showFieldError('phone', 'Please enter a valid phone number (min. 7 digits).');
+                isValid = false;
+            }
+
+            // Doctor Specific Validations
+            if (role === 'DOCTOR') {
+                if (!first_name) {
+                    showFieldError('first_name', 'First name is required.');
+                    isValid = false;
+                }
+                if (!last_name) {
+                    showFieldError('last_name', 'Last name is required.');
+                    isValid = false;
+                }
+                if (!specialty) {
+                    showFieldError('specialty', 'Please select a medical specialty.');
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) {
+                showAlert('Please fix the errors indicated below.', 'error');
+                return;
+            }
+
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Registering Account...';
+
+            try {
+                const res = await window.ApiService.register({
+                    username,
+                    email,
+                    phone,
+                    first_name,
+                    last_name,
+                    password,
+                    role,
+                    specialty
+                });
+
+                if (res && res.success) {
+                    showAlert('Account created successfully! Redirecting...', 'success');
+                    setTimeout(() => {
+                        if (res.user.role === 'ADMIN' || res.user.role === 'DOCTOR' || res.user.is_staff) {
+                            window.location.href = '/dashboard/overview/';
+                        } else {
+                            window.location.href = '/pages/appointment.html';
+                        }
+                    }, 1200);
+                } else {
+                    let errMsg = 'Failed to register account.';
+                    if (res && res.errors) {
+                        for (const [key, val] of Object.entries(res.errors)) {
+                            const msg = Array.isArray(val) ? val.join(' ') : val;
+                            showFieldError(key, msg);
+                        }
+                        const firstKey = Object.keys(res.errors)[0];
+                        errMsg = `${firstKey}: ${Array.isArray(res.errors[firstKey]) ? res.errors[firstKey][0] : res.errors[firstKey]}`;
+                    } else if (res && res.error) {
+                        errMsg = res.error;
+                    }
+                    showAlert(errMsg, 'error');
+                    signupBtn.disabled = false;
+                    signupBtn.innerHTML = 'Register Account <span class="fas fa-user-plus"></span>';
+                }
+            } catch (err) {
+                showAlert('Connection error. Please try again.', 'error');
+                signupBtn.disabled = false;
+                signupBtn.innerHTML = 'Register Account <span class="fas fa-user-plus"></span>';
+            }
+        });
+
+        function showFieldError(fieldId, msg) {
+            const input = document.getElementById(fieldId);
+            const errSpan = document.getElementById(`err-${fieldId}`);
+            if (input) input.classList.add('is-invalid');
+            if (errSpan) errSpan.textContent = msg;
+        }
+
+        function clearFieldError(fieldId) {
+            const input = document.getElementById(fieldId);
+            const errSpan = document.getElementById(`err-${fieldId}`);
+            if (input) input.classList.remove('is-invalid');
+            if (errSpan) errSpan.textContent = '';
+        }
+
+        function clearAllErrors() {
+            fields.forEach(f => clearFieldError(f));
+            alertBox.style.display = 'none';
+        }
+
+        function showAlert(msg, type) {
+            alertBox.textContent = msg;
+            alertBox.className = `alert-box ${type}`;
+            alertBox.style.display = 'block';
+        }
+    });
+</script>
+
+</body>
+</html>

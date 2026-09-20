@@ -53,6 +53,11 @@
     cursor: pointer;
 }
 
+.appointment .row form .box.is-invalid {
+    border-color: #e74c3c !important;
+    background-color: #fdf2f2 !important;
+}
+
 .appointment .row form .btn {
     padding: 1rem 4rem;
 }

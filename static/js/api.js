@@ -65,6 +65,8 @@ class ApiService {
     static async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
         const csrftoken = this.getCookie('csrftoken');
+        const authToken = localStorage.getItem('hms_token') || sessionStorage.getItem('hms_token');
+
         const defaultHeaders = {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -72,6 +74,10 @@ class ApiService {
 
         if (csrftoken) {
             defaultHeaders['X-CSRFToken'] = csrftoken;
+        }
+
+        if (authToken) {
+            defaultHeaders['Authorization'] = `Token ${authToken}`;
         }
 
         try {
@@ -94,6 +100,32 @@ class ApiService {
     }
 
     // Auth
+    static async register(userData) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/register/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success) {
+                if (data.token) {
+                    localStorage.setItem('hms_token', data.token);
+                    sessionStorage.setItem('hms_token', data.token);
+                }
+                localStorage.setItem('hms_auth_user', JSON.stringify(data.user));
+                sessionStorage.setItem('hms_auth_user', JSON.stringify(data.user));
+                return { success: true, user: data.user, token: data.token };
+            } else {
+                return { success: false, errors: data.errors, error: data.error || 'Registration failed' };
+            }
+        } catch (err) {
+            return { success: false, error: 'Registration server error.' };
+        }
+    }
+
     static async login(username, password) {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/login/`, {
@@ -105,15 +137,21 @@ class ApiService {
 
             const data = await response.json();
             if (response.ok && data.success) {
+                if (data.token) {
+                    localStorage.setItem('hms_token', data.token);
+                    sessionStorage.setItem('hms_token', data.token);
+                }
+                localStorage.setItem('hms_auth_user', JSON.stringify(data.user));
                 sessionStorage.setItem('hms_auth_user', JSON.stringify(data.user));
-                return { success: true, user: data.user };
+                return { success: true, user: data.user, token: data.token };
             } else {
                 return { success: false, error: data.error || 'Invalid credentials' };
             }
         } catch (err) {
             // Mock auth fallback for presentation demo
             if (username === 'admin' && (password === 'admin' || password === 'admin123')) {
-                const mockUser = { username: 'admin', email: 'admin@hms.com', is_staff: true };
+                const mockUser = { username: 'admin', email: 'admin@hms.com', role: 'ADMIN', is_staff: true };
+                localStorage.setItem('hms_auth_user', JSON.stringify(mockUser));
                 sessionStorage.setItem('hms_auth_user', JSON.stringify(mockUser));
                 return { success: true, user: mockUser };
             }
@@ -122,8 +160,14 @@ class ApiService {
     }
 
     static async logout() {
+        try {
+            await this.request('/auth/logout/', { method: 'POST' });
+        } catch (e) { }
+
+        localStorage.removeItem('hms_token');
+        sessionStorage.removeItem('hms_token');
+        localStorage.removeItem('hms_auth_user');
         sessionStorage.removeItem('hms_auth_user');
-        await this.request('/auth/logout/', { method: 'POST' });
         window.location.href = '/login/';
     }
 
@@ -131,6 +175,11 @@ class ApiService {
         try {
             const data = await this.request('/auth/user/');
             if (data && data.authenticated) {
+                if (data.token) {
+                    localStorage.setItem('hms_token', data.token);
+                    sessionStorage.setItem('hms_token', data.token);
+                }
+                localStorage.setItem('hms_auth_user', JSON.stringify(data.user));
                 sessionStorage.setItem('hms_auth_user', JSON.stringify(data.user));
                 return data.user;
             }
@@ -138,9 +187,53 @@ class ApiService {
             console.warn('Backend session check failed:', e);
         }
         
-        sessionStorage.removeItem('hms_auth_user');
+        // Fallback to stored user if session call returned null/unauthenticated
+        const stored = localStorage.getItem('hms_auth_user') || sessionStorage.getItem('hms_auth_user');
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (err) { }
+        }
         return null;
     }
+
+    static async updateProfile(formDataOrObject) {
+        const csrftoken = this.getCookie('csrftoken');
+        const authToken = localStorage.getItem('hms_token') || sessionStorage.getItem('hms_token');
+        
+        const headers = {};
+        if (csrftoken) headers['X-CSRFToken'] = csrftoken;
+        if (authToken) headers['Authorization'] = `Token ${authToken}`;
+
+        let body = formDataOrObject;
+        if (!(formDataOrObject instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+            body = JSON.stringify(formDataOrObject);
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/profile/`, {
+                method: 'POST',
+                headers,
+                credentials: 'include',
+                body
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success) {
+                if (data.user) {
+                    localStorage.setItem('hms_auth_user', JSON.stringify(data.user));
+                    sessionStorage.setItem('hms_auth_user', JSON.stringify(data.user));
+                }
+                return { success: true, user: data.user, message: data.message };
+            } else {
+                return { success: false, error: data.error || data.detail || 'Failed to update profile picture' };
+            }
+        } catch (err) {
+            return { success: false, error: 'Connection error while updating profile.' };
+        }
+    }
+
 
     // Stats
     static async getStats() {
@@ -219,6 +312,18 @@ class ApiService {
         return { success: true, data: appt };
     }
 
+    static async updateAppointment(id, appointmentData) {
+        const data = await this.request(`/appointments/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(appointmentData)
+        });
+        if (data) return { success: true, data };
+        
+        const appt = MOCK_DATA.appointments.find(a => a.id == id);
+        if (appt) Object.assign(appt, appointmentData);
+        return { success: true, data: appt };
+    }
+
     static async deleteAppointment(id) {
         await this.request(`/appointments/${id}/`, { method: 'DELETE' });
         MOCK_DATA.appointments = MOCK_DATA.appointments.filter(a => a.id !== id);
@@ -255,6 +360,24 @@ class ApiService {
         const newBlog = { id: Date.now(), ...blogData };
         MOCK_DATA.blogs.unshift(newBlog);
         return { success: true, data: newBlog };
+    }
+
+    static async updateBlogStatus(id, status) {
+        const data = await this.request(`/blogs/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status })
+        });
+        if (data) return { success: true, data };
+        return { success: false, error: 'Failed to update blog status.' };
+    }
+
+    static async updateBlog(id, blogData) {
+        const data = await this.request(`/blogs/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(blogData)
+        });
+        if (data) return { success: true, data };
+        return { success: false, error: 'Failed to update blog.' };
     }
 
     static async deleteBlog(id) {

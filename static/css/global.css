@@ -82,6 +82,10 @@ section:nth-child(even) {
     margin-left: 1rem;
 }
 
+.page-spacer {
+    height: 10rem;
+}
+
 /* Global Alert / Toast Messaging */
 .alert-message {
     padding: 1.5rem 1rem;

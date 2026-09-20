@@ -6,6 +6,14 @@ from django.conf import settings
 from .views import (
     HomeView,
     LoginView,
+    SignupView,
+    AppointmentView,
+    AboutView,
+    ServicesView,
+    DoctorsPageView,
+    ReviewsPageView,
+    BlogsPageView,
+    DynamicPageView,
     DashboardOverviewView,
     DashboardAppointmentsView,
     DashboardAppointmentEditView,
@@ -26,6 +34,24 @@ urlpatterns = [
     # Frontend Homepage & Auth
     path('', HomeView.as_view(), name='home'),
     path('login/', LoginView.as_view(), name='login'),
+    path('signup/', SignupView.as_view(), name='signup'),
+
+    # Public Frontend Pages (.html & clean URLs)
+    path('appointment/', AppointmentView.as_view(), name='appointment'),
+    path('about/', AboutView.as_view(), name='about'),
+    path('services/', ServicesView.as_view(), name='services'),
+    path('doctors-page/', DoctorsPageView.as_view(), name='doctors-page'),
+    path('reviews-page/', ReviewsPageView.as_view(), name='reviews-page'),
+    path('blogs-page/', BlogsPageView.as_view(), name='blogs-page'),
+
+    path('pages/signup.html', SignupView.as_view(), name='signup-html'),
+    path('pages/appointment.html', AppointmentView.as_view(), name='appointment-html'),
+    path('pages/about.html', AboutView.as_view(), name='about-html'),
+    path('pages/services.html', ServicesView.as_view(), name='services-html'),
+    path('pages/doctors.html', DoctorsPageView.as_view(), name='doctors-html'),
+    path('pages/reviews.html', ReviewsPageView.as_view(), name='reviews-html'),
+    path('pages/blogs.html', BlogsPageView.as_view(), name='blogs-html'),
+    path('pages/<str:page_name>.html', DynamicPageView.as_view(), name='dynamic-page-html'),
 
     # Admin Dashboard Routes & Dedicated Create/Edit Pages
     path('dashboard/', DashboardOverviewView.as_view(), name='dashboard-overview'),

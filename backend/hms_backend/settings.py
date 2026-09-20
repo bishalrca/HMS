@@ -9,6 +9,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# Custom User Model
+AUTH_USER_MODEL = 'api.CustomUser'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -19,6 +22,7 @@ INSTALLED_APPS = [
     
     # Third party packages
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     
     # Local apps
@@ -130,6 +134,7 @@ CORS_ALLOW_HEADERS = [
 # Django REST Framework Settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
         'api.authentication.CsrfExemptSessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],

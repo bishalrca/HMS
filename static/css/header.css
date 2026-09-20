@@ -12,29 +12,124 @@
 
 .header .logo {
     font-size: 2.5rem;
-    color: var(--black);
+    color: #fff;
+    font-weight: 700;
 }
 
 .header .logo i {
-    color: var(--black);
+    color: #fff;
+}
+
+.header .navbar {
+    display: flex;
+    align-items: center;
 }
 
 .header .navbar a {
     font-size: 1.7rem;
-    color: var(--light-color);
+    color: #fff;
     margin-left: 2rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
 .header .navbar a:hover,
 .header .navbar a.active {
-    color: red;
+    color: #111;
+}
+
+/* Auth Buttons Container */
+.header .nav-auth-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: 2rem;
+}
+
+.nav-auth-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.6rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    text-transform: capitalize;
+    transition: all 0.2s ease-in-out;
+}
+
+/* High-specificity override for navbar Login button */
+.header .navbar a.nav-auth-btn.btn-login {
+    background: #ffffff !important;
+    color: #16a085 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.header .navbar a.nav-auth-btn.btn-login:hover {
+    background: #444444 !important;
+    color: #ffffff !important;
+    border-color: #444444 !important;
+}
+
+/* High-specificity override for navbar Signup button */
+.header .navbar a.nav-auth-btn.btn-signup {
+    background: #444444 !important;
+    color: #ffffff !important;
+    border: 2px solid #444444 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.header .navbar a.nav-auth-btn.btn-signup:hover {
+    background: #ffffff !important;
+    color: #16a085 !important;
+    border-color: #ffffff !important;
+}
+
+/* Logout button */
+.nav-auth-btn.btn-logout {
+    background: #e74c3c !important;
+    color: #ffffff !important;
+    border: 2px solid #e74c3c !important;
+}
+
+.nav-auth-btn.btn-logout:hover {
+    background: #c0392b !important;
+    border-color: #c0392b !important;
+}
+
+.user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff !important;
+    padding: 0.5rem 1.2rem;
+    border-radius: 2rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.user-badge i {
+    font-size: 1.6rem;
+}
+
+.user-role-tag {
+    font-size: 1.1rem;
+    background: var(--black);
+    color: #fff;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 #menu-btn {
     font-size: 2.5rem;
     border-radius: .5rem;
-    background: var(--green);
-    color: #fff;
+    background: #fff;
+    color: var(--green);
     padding: 1rem 1.5rem;
     cursor: pointer;
     display: none;
@@ -63,6 +158,9 @@
         opacity: 0;
         transform-origin: top right;
         transition: none;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem 0;
     }
 
     .header .navbar.active {
@@ -72,8 +170,44 @@
     }
 
     .header .navbar a {
-        font-size: 2rem;
+        font-size: 1.8rem;
         display: block;
-        margin: 2.5rem;
+        margin: 1rem 2rem;
+        color: var(--black);
+    }
+
+    .header .navbar a:hover,
+    .header .navbar a.active {
+        color: var(--green);
+    }
+
+    .header .nav-auth-container {
+        flex-direction: column;
+        width: 100%;
+        margin-left: 0;
+        padding: 1rem 2rem 0 2rem;
+        border-top: 1px solid #eee;
+        align-items: stretch;
+    }
+
+    .header .navbar a.nav-auth-btn.btn-login {
+        background: var(--green) !important;
+        color: #ffffff !important;
+        border-color: var(--green) !important;
+        text-align: center;
+        justify-content: center;
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: 0.8rem;
+    }
+
+    .header .navbar a.nav-auth-btn.btn-signup {
+        background: var(--black) !important;
+        color: #ffffff !important;
+        border-color: var(--black) !important;
+        text-align: center;
+        justify-content: center;
+        width: 100%;
+        margin-left: 0;
     }
 }

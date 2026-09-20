@@ -15,16 +15,19 @@ def create_super_admin():
 
     if not User.objects.filter(username=username).exists():
         print(f"Creating superuser '{username}'...")
-        User.objects.create_superuser(username=username, email=email, password=password)
-        print(f" SUCCESS: Superuser '{username}' created with password '{password}'!")
+        user = User.objects.create_superuser(username=username, email=email, password=password)
+        user.role = getattr(User, 'ADMIN', 'ADMIN')
+        user.save()
+        print(f" SUCCESS: Superuser '{username}' created with password '{password}' and ADMIN role!")
     else:
         # Reset password to admin123
         u = User.objects.get(username=username)
         u.set_password(password)
         u.is_staff = True
         u.is_superuser = True
+        u.role = getattr(User, 'ADMIN', 'ADMIN')
         u.save()
-        print(f" SUCCESS: Updated credentials for superuser '{username}' (password: '{password}')")
+        print(f" SUCCESS: Updated credentials for superuser '{username}' (password: '{password}') and ADMIN role.")
 
 if __name__ == '__main__':
     create_super_admin()
