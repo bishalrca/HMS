@@ -36,6 +36,25 @@
             <h2>Hospital Analytics Overview</h2>
         </div>
 
+        <section class="branding-settings" id="branding-settings" hidden>
+            <div>
+                <h3>Website Logo</h3>
+                <p>Manage the logo displayed across the hospital website.</p>
+            </div>
+            <div class="branding-preview" id="branding-preview" hidden>
+                <span>Current logo</span>
+                <img id="current-site-logo" alt="Current website logo">
+            </div>
+            <label class="branding-upload" for="site-logo-upload">
+                <i class="fas fa-upload"></i> <span id="branding-upload-label">Upload logo</span>
+                <input id="site-logo-upload" type="file" accept="image/*" hidden>
+            </label>
+            <button class="branding-remove" id="branding-remove" type="button" hidden>
+                <i class="fas fa-trash-alt"></i> Remove logo
+            </button>
+            <span id="branding-status" role="status" aria-live="polite"></span>
+        </section>
+
         <div class="stats-grid">
             <div class="stat-card">
                 <i class="fas fa-user-md"></i>

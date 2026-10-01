@@ -41,7 +41,18 @@
                 </div>
                 <div class="form-group">
                     <label>Specialty / Specialization Name:</label>
-                    <input type="text" id="doc-specialty" name="specialty" placeholder="e.g. CARDIOLOGIST" class="input-box" required>
+                    <select id="doc-specialty" name="specialty" class="input-box" required>
+                        <option value="" disabled selected>Select a specialty</option>
+                        <option value="CARDIOLOGIST">Cardiologist</option>
+                        <option value="GENERAL SURGEON">General Surgeon</option>
+                        <option value="GENERAL MEDICINE">General Medicine</option>
+                        <option value="PEDIATRICIAN">Pediatrician</option>
+                        <option value="GYNECOLOGIST">Gynecologist</option>
+                        <option value="NEUROLOGIST">Neurologist</option>
+                        <option value="DERMATOLOGIST">Dermatologist</option>
+                        <option value="ORTHOPEDIC SURGEON">Orthopedic Surgeon</option>
+                        <option value="UROLOGIST">Urologist</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Upload Profile Photo (File Upload):</label>

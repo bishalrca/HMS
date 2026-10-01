@@ -1,58 +1,76 @@
 .doctors .box-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+    gap: 2.5rem;
 }
 
 .doctors .box-container .box {
     text-align: center;
-    background: #fff;
-    border-radius: .5rem;
-    border: var(--border);
-    box-shadow: var(--box-shadow);
-    padding: 2rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbf9 100%);
+    border: 1px solid rgba(18, 183, 120, 0.12);
+    border-radius: 2rem;
+    box-shadow: 0 1.5rem 3rem rgba(15, 23, 42, 0.08);
+    padding: 2rem 2rem 2.4rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.doctors .box-container .box:hover {
+    transform: translateY(-0.7rem);
+    box-shadow: 0 2.2rem 4rem rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.28);
 }
 
 .doctors .box-container .box img {
     height: 20rem;
     width: 20rem;
     object-fit: cover;
-    border: var(--border);
-    border-radius: .5rem;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    border: 0.4rem solid rgba(16, 185, 129, 0.12);
+    border-radius: 50%;
+    margin: 0.5rem auto 1.5rem;
+    box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.08);
 }
 
 .doctors .box-container .box h3 {
     color: var(--black);
-    font-size: 2.5rem;
+    font-size: 2.3rem;
+    margin-bottom: 0.8rem;
 }
 
 .doctors .box-container .box span {
+    display: inline-block;
     color: var(--green);
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(16, 185, 129, 0.08);
+    padding: 0.8rem 1.2rem;
+    border-radius: 999px;
 }
 
 .doctors .box-container .box .share {
-    padding-top: 2rem;
+    padding-top: 2.2rem;
 }
 
 .doctors .box-container .box .share a {
-    display: inline-block;
-    height: 5rem;
-    width: 5rem;
-    line-height: 4.5rem;
-    font-size: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 4.2rem;
+    width: 4.2rem;
+    font-size: 1.8rem;
     color: var(--green);
-    border-radius: .5rem;
-    border: var(--border);
-    margin: .3rem;
+    background: #f5faf7;
+    border-radius: 50%;
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    margin: 0.4rem;
     text-align: center;
+    transition: all 0.25s ease;
 }
 
 .doctors .box-container .box .share a:hover {
     background: var(--green);
     color: #fff;
-    box-shadow: var(--box-shadow);
+    box-shadow: 0 1rem 1.8rem rgba(16, 185, 129, 0.22);
+    transform: translateY(-0.2rem);
 }

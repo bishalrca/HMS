@@ -96,3 +96,10 @@ class Blog(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.status})"
+
+
+class SiteBranding(models.Model):
+    logo = models.CharField(max_length=500, blank=True, default='')
+
+    def __str__(self):
+        return 'Site branding'

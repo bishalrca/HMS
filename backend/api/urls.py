@@ -13,7 +13,8 @@ from .views import (
     ReviewDetailAPIView,
     BlogListCreateAPIView,
     BlogDetailAPIView,
-    DashboardStatsAPIView
+    DashboardStatsAPIView,
+    SiteBrandingAPIView
 )
 
 urlpatterns = [
@@ -26,6 +27,7 @@ urlpatterns = [
 
     # Stats
     path('stats/', DashboardStatsAPIView.as_view(), name='dashboard-stats'),
+    path('branding/', SiteBrandingAPIView.as_view(), name='site-branding'),
 
     # Doctors CRUD
     path('doctors/', DoctorListCreateAPIView.as_view(), name='doctor-list-create'),

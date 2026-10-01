@@ -4,7 +4,10 @@
  * Session Authentication, and Admin Dashboard operations.
  */
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+const API_ORIGIN = window.location.port === '8000'
+    ? window.location.origin
+    : `${window.location.protocol === 'https:' ? 'https:' : 'http:'}//${window.location.hostname || '127.0.0.1'}:8000`;
+const API_BASE_URL = `${API_ORIGIN}/api`;
 
 const MOCK_DATA = {
     stats: {
@@ -47,6 +50,10 @@ const MOCK_DATA = {
 };
 
 class ApiService {
+    static getAppUrl(path) {
+        return `${API_ORIGIN}${path}`;
+    }
+
     static getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -388,3 +395,120 @@ class ApiService {
 }
 
 window.ApiService = ApiService;
+
+async function loadSiteBranding() {
+    const brandElements = document.querySelectorAll('.logo, .brand');
+    const defaultBrandContent = new Map(
+        Array.from(brandElements, (brand) => [brand, brand.innerHTML])
+    );
+    const status = document.getElementById('branding-status');
+    const uploadInput = document.getElementById('site-logo-upload');
+    const preview = document.getElementById('branding-preview');
+    const previewImage = document.getElementById('current-site-logo');
+    const uploadLabel = document.getElementById('branding-upload-label');
+    const removeButton = document.getElementById('branding-remove');
+
+    function applyLogo(url) {
+        if (!url) {
+            brandElements.forEach((brand) => {
+                brand.innerHTML = defaultBrandContent.get(brand);
+            });
+            if (preview) preview.hidden = true;
+            if (removeButton) removeButton.hidden = true;
+            if (uploadLabel) uploadLabel.textContent = 'Upload logo';
+            return;
+        }
+
+        brandElements.forEach((brand) => {
+            const image = document.createElement('img');
+            image.src = url;
+            image.alt = 'Hospital logo';
+            image.style.maxWidth = '18rem';
+            image.style.maxHeight = '4.2rem';
+            image.style.objectFit = 'contain';
+            brand.replaceChildren(image);
+        });
+        if (previewImage) previewImage.src = url;
+        if (preview) preview.hidden = false;
+        if (removeButton) removeButton.hidden = false;
+        if (uploadLabel) uploadLabel.textContent = 'Replace logo';
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/branding/`);
+        if (response.ok) applyLogo((await response.json()).logo_url);
+    } catch (error) {
+        console.warn('Unable to load site logo:', error);
+    }
+
+    if (!uploadInput) return;
+
+    const user = await ApiService.getCurrentUser();
+    const role = (user?.role || (user?.is_staff ? 'ADMIN' : '')).toUpperCase();
+    if (role !== 'ADMIN' && !user?.is_superuser) return;
+    document.getElementById('branding-settings').hidden = false;
+
+    uploadInput.addEventListener('change', async () => {
+        const file = uploadInput.files[0];
+        if (!file) return;
+
+        status.textContent = 'Uploading logo...';
+        status.classList.remove('error');
+        const formData = new FormData();
+        formData.append('logo_file', file);
+        const headers = {};
+        const token = localStorage.getItem('hms_token') || sessionStorage.getItem('hms_token');
+        const csrfToken = ApiService.getCookie('csrftoken');
+        if (token) headers.Authorization = `Token ${token}`;
+        if (csrfToken) headers['X-CSRFToken'] = csrfToken;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/branding/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers,
+                body: formData
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || data.detail || 'Logo upload failed.');
+            applyLogo(data.logo_url);
+            status.textContent = 'Logo updated across the website.';
+        } catch (error) {
+            status.textContent = error.message || 'Logo upload failed.';
+            status.classList.add('error');
+        } finally {
+            uploadInput.value = '';
+        }
+    });
+
+    if (removeButton) {
+        removeButton.addEventListener('click', async () => {
+            if (!window.confirm('Remove the website logo?')) return;
+
+            status.textContent = 'Removing logo...';
+            status.classList.remove('error');
+            const headers = {};
+            const token = localStorage.getItem('hms_token') || sessionStorage.getItem('hms_token');
+            const csrfToken = ApiService.getCookie('csrftoken');
+            if (token) headers.Authorization = `Token ${token}`;
+            if (csrfToken) headers['X-CSRFToken'] = csrfToken;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/branding/`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || data.detail || 'Logo removal failed.');
+                applyLogo('');
+                status.textContent = 'Logo removed from the website.';
+            } catch (error) {
+                status.textContent = error.message || 'Logo removal failed.';
+                status.classList.add('error');
+            }
+        });
+    }
+}
+
+loadSiteBranding();

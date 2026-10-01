@@ -197,6 +197,90 @@ body {
     letter-spacing: .1rem;
 }
 
+.branding-settings {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    background: #fff;
+    border: var(--border);
+    border-radius: .5rem;
+    padding: 1.8rem 2rem;
+    margin-bottom: 2.5rem;
+}
+
+#branding-settings[hidden] {
+    display: none;
+}
+
+.branding-settings h3 {
+    color: var(--black);
+    font-size: 1.8rem;
+}
+
+.branding-settings p,
+#branding-status {
+    color: var(--light-color);
+    font-size: 1.3rem;
+}
+
+.branding-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: .8rem;
+    padding: 1rem 1.4rem;
+    border-radius: .4rem;
+    background: var(--green);
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.4rem;
+}
+
+.branding-upload:hover {
+    background: #117a65;
+}
+
+.branding-preview {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--light-color);
+    font-size: 1.3rem;
+}
+
+.branding-preview img {
+    display: block;
+    max-width: 18rem;
+    max-height: 6rem;
+    object-fit: contain;
+}
+
+.branding-remove {
+    display: inline-flex;
+    align-items: center;
+    gap: .8rem;
+    padding: 1rem 1.4rem;
+    border: 1px solid #b42318;
+    border-radius: .4rem;
+    background: #fff;
+    color: #b42318;
+    cursor: pointer;
+    font-size: 1.4rem;
+}
+
+.branding-remove:hover {
+    background: #fff4f2;
+}
+
+#branding-remove[hidden],
+#branding-preview[hidden] {
+    display: none;
+}
+
+#branding-status.error {
+    color: #b42318;
+}
+
 /* Overview Stat Cards */
 .stats-grid {
     display: grid;

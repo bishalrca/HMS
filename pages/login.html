@@ -93,6 +93,22 @@
             font-size: 1.5rem;
             font-weight: 500;
         }
+
+        .signup-prompt {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+            color: var(--light-color);
+        }
+
+        .signup-prompt a {
+            color: var(--green);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .signup-prompt a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -103,64 +119,87 @@
 
     <div id="error-message" class="error-alert"></div>
 
-    <form id="login-form" action="#" method="post">
+    <form id="login-form" action="javascript:void(0)" method="post" onsubmit="handleLoginSubmit(event)">
         <input type="text" id="username" name="username" placeholder="Username" class="box" required autocomplete="username">
         <input type="password" id="password" name="password" placeholder="Password" class="box" required autocomplete="current-password">
         <button type="submit" id="login-btn" class="btn">Login to Dashboard <span class="fas fa-sign-in-alt"></span></button>
     </form>
+
+    <div class="signup-prompt">
+        Haven't signed up yet? <a href="/signup/">Create an account</a>
+    </div>
 
     <div style="margin-top: 2rem;">
         <a href="/" style="font-size: 1.4rem; color: var(--green);"><i class="fas fa-arrow-left"></i> Return to Main Hospital Site</a>
     </div>
 </div>
 
-<script src="/static/js/api.js?v=1.1"></script>
+<script src="/static/js/api.js?v=1.2"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const form = document.getElementById('login-form');
+    function showError(msg) {
         const errorAlert = document.getElementById('error-message');
+        if (!errorAlert) return;
+        errorAlert.textContent = msg;
+        errorAlert.style.display = 'block';
+    }
+
+    function getDashboardRoute(user) {
+        if (!user) return '/dashboard/overview/';
+
+        const role = (user.role || (user.is_staff ? 'ADMIN' : 'PATIENT')).toUpperCase();
+        if (user.username && user.username.toLowerCase() === 'shishir') {
+            return '/dashboard/overview/';
+        }
+        if (role === 'ADMIN' || role === 'DOCTOR') {
+            return '/dashboard/overview/';
+        }
+        return '/dashboard/appointments/';
+    }
+
+    async function handleLoginSubmit(e) {
+        e.preventDefault();
+
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
         const loginBtn = document.getElementById('login-btn');
 
-        if (!form) return;
+        const username = usernameInput ? usernameInput.value.trim() : '';
+        const password = passwordInput ? passwordInput.value.trim() : '';
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
+        if (!username || !password) {
+            showError('Please enter both username and password.');
+            return;
+        }
 
-            const username = usernameInput ? usernameInput.value.trim() : '';
-            const password = passwordInput ? passwordInput.value.trim() : '';
+        if (loginBtn) {
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Authenticating...';
+        }
 
-            if (!username || !password) {
-                showError('Please enter both username and password.');
+        try {
+            const res = await window.ApiService.login(username, password);
+
+            if (res && res.success) {
+                window.location.href = window.ApiService.getAppUrl(getDashboardRoute(res.user));
                 return;
             }
 
-            loginBtn.disabled = true;
-            loginBtn.textContent = 'Authenticating...';
-
-            try {
-                const res = await window.ApiService.login(username, password);
-
-                if (res && res.success) {
-                    window.location.href = '/dashboard/overview/';
-                } else {
-                    showError((res && res.error) ? res.error : 'Invalid username or password.');
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = 'Login to Dashboard <span class="fas fa-sign-in-alt"></span>';
-                }
-            } catch (err) {
-                showError('Connection error. Please check your credentials.');
+            showError((res && res.error) ? res.error : 'Invalid username or password.');
+        } catch (err) {
+            console.error('Login failed:', err);
+            showError('Connection error. Please check your credentials.');
+        } finally {
+            if (loginBtn) {
                 loginBtn.disabled = false;
                 loginBtn.innerHTML = 'Login to Dashboard <span class="fas fa-sign-in-alt"></span>';
             }
-        });
-
-        function showError(msg) {
-            errorAlert.textContent = msg;
-            errorAlert.style.display = 'block';
         }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('login-form');
+        if (!form) return;
+        form.addEventListener('submit', handleLoginSubmit);
     });
 </script>
 

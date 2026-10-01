@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.authtoken.models import Token
 
-from .models import Doctor, Appointment, Review, Blog, CustomUser
+from .models import Doctor, Appointment, Review, Blog, CustomUser, SiteBranding
 from .serializers import (
     DoctorSerializer,
     AppointmentSerializer,
@@ -26,6 +26,44 @@ from .permissions import IsPatient, IsDoctor, IsAdmin, AppointmentPermission
 
 User = get_user_model()
 
+
+class SiteBrandingAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_permissions(self):
+        if self.request.method in ('POST', 'DELETE'):
+            return [IsAdmin()]
+        return [permissions.AllowAny()]
+
+    def get(self, request):
+        branding, _ = SiteBranding.objects.get_or_create(pk=1)
+        return Response({'logo_url': branding.logo})
+
+    def post(self, request):
+        logo_file = request.FILES.get('logo_file')
+        if not logo_file or not (logo_file.content_type or '').startswith('image/'):
+            return Response(
+                {'error': 'Please upload a valid image file.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        branding, _ = SiteBranding.objects.get_or_create(pk=1)
+        previous_logo = branding.logo
+        branding.logo = save_uploaded_file(logo_file, 'branding')
+        branding.save(update_fields=['logo'])
+        if previous_logo and previous_logo != branding.logo:
+            delete_uploaded_file(previous_logo)
+        return Response({'success': True, 'logo_url': branding.logo})
+
+    def delete(self, request):
+        branding, _ = SiteBranding.objects.get_or_create(pk=1)
+        logo_url = branding.logo
+        branding.logo = ''
+        branding.save(update_fields=['logo'])
+        if logo_url:
+            delete_uploaded_file(logo_url)
+        return Response({'success': True, 'logo_url': ''})
+
 # Helper to save uploaded file
 def save_uploaded_file(uploaded_file, folder='uploads'):
     folder_path = Path(settings.MEDIA_ROOT) / folder
@@ -34,6 +72,12 @@ def save_uploaded_file(uploaded_file, folder='uploads'):
     file_path = folder_path / uploaded_file.name
     saved_path = default_storage.save(f"{folder}/{uploaded_file.name}", ContentFile(uploaded_file.read()))
     return f"/media/{saved_path}"
+
+
+def delete_uploaded_file(file_url):
+    branding_prefix = '/media/branding/'
+    if file_url.startswith(branding_prefix):
+        default_storage.delete(file_url[len('/media/'):])
 
 # Authentication API Views
 @method_decorator(csrf_exempt, name='dispatch')
