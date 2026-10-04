@@ -9,6 +9,7 @@ from .views import (
     DoctorDetailAPIView,
     AppointmentListCreateAPIView,
     AppointmentDetailAPIView,
+    DoctorBookedDatesAPIView,
     ReviewListCreateAPIView,
     ReviewDetailAPIView,
     BlogListCreateAPIView,
@@ -34,6 +35,7 @@ urlpatterns = [
     path('doctors/<int:pk>/', DoctorDetailAPIView.as_view(), name='doctor-detail'),
 
     # Appointments CRUD
+    path('doctors/<int:doctor_id>/booked-dates/', DoctorBookedDatesAPIView.as_view(), name='doctor-booked-dates'),
     path('appointments/', AppointmentListCreateAPIView.as_view(), name='appointment-list-create'),
     path('appointments/<int:pk>/', AppointmentDetailAPIView.as_view(), name='appointment-detail'),
 

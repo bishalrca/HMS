@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from .models import Doctor, Appointment, Review, Blog
 
@@ -124,10 +125,66 @@ class DoctorSerializer(serializers.ModelSerializer):
 class AppointmentSerializer(serializers.ModelSerializer):
     patient_name = serializers.ReadOnlyField(source='patient.get_full_name')
     doctor_name = serializers.ReadOnlyField(source='doctor.name')
+    queue_position = serializers.SerializerMethodField()
 
     class Meta:
         model = Appointment
         fields = '__all__'
+
+    def get_queue_position(self, obj):
+        if obj.status != 'PENDING' or not obj.doctor_id:
+            return None
+        return Appointment.objects.filter(
+            doctor_id=obj.doctor_id,
+            date=obj.date,
+            status='PENDING',
+        ).filter(
+            Q(created_at__lt=obj.created_at) |
+            Q(created_at=obj.created_at, pk__lte=obj.pk)
+        ).count()
+
+    def validate(self, attrs):
+        doctor = attrs.get('doctor', getattr(self.instance, 'doctor', None))
+        appointment_date = attrs.get('date', getattr(self.instance, 'date', None))
+        status = attrs.get('status', getattr(self.instance, 'status', 'PENDING'))
+
+        if not self.instance and doctor and not attrs.get('time'):
+            raise serializers.ValidationError({'time': 'Appointment time is required.'})
+
+        if self.instance and status == 'CANCELLED':
+            return attrs
+        if self.instance and not any(field in attrs for field in ('doctor', 'date', 'status')):
+            return attrs
+        if (
+            self.instance
+            and self.instance.status in ('REJECTED', 'CANCELLED')
+            and status != self.instance.status
+        ):
+            raise serializers.ValidationError({
+                'status': 'Rejected or cancelled appointments cannot be reopened. Please create a new booking.'
+            })
+        if status not in ('PENDING', 'CONFIRMED') or not doctor or not appointment_date:
+            return attrs
+
+        existing_confirmed = Appointment.objects.filter(
+            doctor=doctor,
+            date=appointment_date,
+            status='CONFIRMED',
+        )
+        if self.instance:
+            existing_confirmed = existing_confirmed.exclude(pk=self.instance.pk)
+        if existing_confirmed.exists():
+            raise serializers.ValidationError({'date': 'This doctor already has a confirmed appointment on this date.'})
+
+        if status == 'CONFIRMED' and self.instance and self.instance.status == 'PENDING':
+            first_pending = Appointment.objects.filter(
+                doctor=doctor,
+                date=appointment_date,
+                status='PENDING',
+            ).order_by('created_at', 'pk').first()
+            if first_pending and first_pending.pk != self.instance.pk:
+                raise serializers.ValidationError({'status': 'An earlier booking is ahead in this date\'s queue.'})
+        return attrs
 
     def validate_name(self, value):
         if not value or len(value.strip()) < 2:

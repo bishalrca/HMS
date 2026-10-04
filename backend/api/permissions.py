@@ -64,16 +64,14 @@ class AppointmentPermission(permissions.BasePermission):
 
         # Patient access to their own appointment
         if getattr(request.user, 'role', '') == 'PATIENT':
+            if request.method in ('PUT', 'PATCH') and request.data.get('status') in ('CONFIRMED', 'REJECTED'):
+                return False
             return obj.patient == request.user or obj.email == request.user.email
 
         # Doctor access to their schedule / assigned appointments
         if getattr(request.user, 'role', '') == 'DOCTOR':
-            # Only Admin can approve appointments (set status to CONFIRMED)
-            new_status = (request.data.get('status') or '').upper()
-            if new_status == 'CONFIRMED':
-                return False
             if hasattr(request.user, 'doctor_profile'):
                 return obj.doctor == request.user.doctor_profile
-            return True
+            return False
 
         return False

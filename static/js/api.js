@@ -295,6 +295,11 @@ class ApiService {
         return MOCK_DATA.appointments;
     }
 
+    static async getBookedAppointmentDates(doctorId) {
+        const data = await this.request(`/doctors/${doctorId}/booked-dates/`);
+        return data && Array.isArray(data.booked_dates) ? data.booked_dates : null;
+    }
+
     static async createAppointment(appointmentData) {
         const data = await this.request('/appointments/', {
             method: 'POST',

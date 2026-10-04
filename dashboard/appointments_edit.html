@@ -6,7 +6,7 @@
     <title>Edit Appointment - Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="/static/css/global.css">
-    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=1.1">
 </head>
 <body>
 
@@ -52,10 +52,15 @@
                     <input type="date" id="appt-date" name="date" class="input-box" required>
                 </div>
                 <div class="form-group">
+                    <label>Appointment Time:</label>
+                    <input type="time" id="appt-time" name="time" class="input-box">
+                </div>
+                <div class="form-group">
                     <label>Appointment Status:</label>
                     <select id="appt-status" name="status" class="input-box" required>
                         <option value="PENDING">Pending</option>
                         <option value="CONFIRMED">Confirmed</option>
+                        <option value="REJECTED">Rejected</option>
                         <option value="CANCELLED">Cancelled</option>
                     </select>
                 </div>
@@ -69,9 +74,9 @@
     </main>
 </div>
 
-<script src="/static/js/api.js?v=1.4"></script>
-<script src="/static/js/dashboard.js?v=1.4"></script>
-<script src="/static/js/dashboard_forms.js?v=1.4"></script>
+<script src="/static/js/api.js?v=1.5"></script>
+<script src="/static/js/dashboard.js?v=1.7"></script>
+<script src="/static/js/dashboard_forms.js?v=1.5"></script>
 <script>
     const pathParts = window.location.pathname.split('/');
     const apptId = pathParts[pathParts.length - 2] || pathParts[pathParts.length - 1];

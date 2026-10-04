@@ -4,8 +4,10 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.utils.timezone import localdate
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.db import transaction
 from django.db.models import Q
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
@@ -306,11 +308,11 @@ class AppointmentListCreateAPIView(generics.ListCreateAPIView):
 
         role = getattr(user, 'role', '')
         if user.is_staff or user.is_superuser or role == CustomUser.ADMIN:
-            return Appointment.objects.all().order_by('-created_at')
+            return Appointment.objects.all().order_by('date', 'created_at', 'pk')
         elif role == CustomUser.DOCTOR:
             if hasattr(user, 'doctor_profile'):
-                return Appointment.objects.filter(doctor=user.doctor_profile).order_by('-created_at')
-            return Appointment.objects.all().order_by('-created_at')
+                return Appointment.objects.filter(doctor=user.doctor_profile).order_by('date', 'created_at', 'pk')
+            return Appointment.objects.none()
         elif role == CustomUser.PATIENT:
             return Appointment.objects.filter(patient=user).order_by('-created_at')
         
@@ -318,15 +320,35 @@ class AppointmentListCreateAPIView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         if self.request.user and self.request.user.is_authenticated:
-            serializer.save(patient=self.request.user)
+            serializer.save(patient=self.request.user, status='PENDING')
         else:
-            serializer.save()
+            serializer.save(status='PENDING')
+
+
+class DoctorBookedDatesAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, doctor_id):
+        booked_dates = Appointment.objects.filter(
+            doctor_id=doctor_id,
+            status='CONFIRMED',
+            date__gte=localdate(),
+        ).values_list('date', flat=True).distinct()
+        return Response({'booked_dates': [booked_date.isoformat() for booked_date in booked_dates]})
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AppointmentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
     permission_classes = [AppointmentPermission]
+
+    def update(self, request, *args, **kwargs):
+        with transaction.atomic():
+            if 'status' in request.data:
+                appointment = self.get_object()
+                if appointment.doctor_id:
+                    Doctor.objects.select_for_update().get(pk=appointment.doctor_id)
+            return super().update(request, *args, **kwargs)
 
 # Reviews Endpoints
 class ReviewListCreateAPIView(generics.ListCreateAPIView):

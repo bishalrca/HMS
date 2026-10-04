@@ -53,6 +53,7 @@ class Appointment(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('CONFIRMED', 'Confirmed'),
+        ('REJECTED', 'Rejected'),
         ('CANCELLED', 'Cancelled'),
     ]
     patient = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointments')
@@ -60,7 +61,9 @@ class Appointment(models.Model):
     name = models.CharField(max_length=150)
     number = models.CharField(max_length=20)
     email = models.EmailField()
+    condition = models.TextField(blank=True, default='')
     date = models.DateField()
+    time = models.TimeField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
 

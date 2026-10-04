@@ -175,29 +175,55 @@ async function loadAppointmentsTable() {
     try {
         const appointments = await window.ApiService.getAppointments();
         if (!appointments || appointments.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; font-size: 1.5rem;">No appointments found. ${currentRole === 'PATIENT' ? '<a href="/pages/appointment.html" style="color: var(--green); font-weight: bold; margin-left: .5rem;">Click here to book an appointment</a>' : ''}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 2rem; font-size: 1.5rem;">No appointments found. ${currentRole === 'PATIENT' ? '<a href="/pages/appointment.html" style="color: var(--green); font-weight: bold; margin-left: .5rem;">Click here to book an appointment</a>' : ''}</td></tr>`;
             return;
         }
+
+        const confirmedDates = new Set(
+            appointments
+                .filter(appt => appt.status === 'CONFIRMED')
+                .map(appt => `${appt.doctor || ''}:${appt.date}`)
+        );
+        const queueCounts = new Map();
+        const queuePositions = new Map();
+        appointments.forEach(appt => {
+            if (appt.status !== 'PENDING') return;
+            const queueKey = `${appt.doctor || ''}:${appt.date}`;
+            const queuePosition = (queueCounts.get(queueKey) || 0) + 1;
+            queueCounts.set(queueKey, queuePosition);
+            queuePositions.set(appt.id, queuePosition);
+        });
 
         tbody.innerHTML = appointments.map(appt => {
             let actionsHtml = '';
             if (currentRole === 'PATIENT') {
-                if (appt.status !== 'CANCELLED') {
+                if (!['CANCELLED', 'REJECTED'].includes(appt.status)) {
                     actionsHtml = `<button class="action-btn btn-cancel" onclick="cancelPatientAppt(${appt.id})"><i class="fas fa-times"></i> Cancel</button>`;
                 } else {
-                    actionsHtml = `<span style="color: #888; font-size: 1.3rem;">Cancelled</span>`;
+                    actionsHtml = `<span style="color: #888; font-size: 1.3rem;">${appt.status === 'REJECTED' ? 'Rejected' : 'Cancelled'}</span>`;
                 }
             } else if (currentRole === 'DOCTOR') {
-                if (appt.status !== 'CANCELLED') {
+                if (appt.status === 'PENDING') {
+                    const queueKey = `${appt.doctor || ''}:${appt.date}`;
+                    const canApprove = queuePositions.get(appt.id) === 1 && !confirmedDates.has(queueKey);
+                    const waitingLabel = confirmedDates.has(queueKey) ? 'Date already approved' : 'Waiting in queue';
+                    actionsHtml = `
+                        ${canApprove ? `<button class="action-btn btn-approve" onclick="updateApptStatus(${appt.id}, 'CONFIRMED')"><i class="fas fa-check"></i> Approve</button>` : `<button class="action-btn btn-approve" disabled>${waitingLabel}</button>`}
+                        <button class="action-btn btn-cancel" onclick="updateApptStatus(${appt.id}, 'REJECTED')"><i class="fas fa-times"></i> Reject</button>
+                    `;
+                } else if (appt.status === 'CONFIRMED') {
                     actionsHtml = `<button class="action-btn btn-cancel" onclick="updateApptStatus(${appt.id}, 'CANCELLED')"><i class="fas fa-times"></i> Cancel</button>`;
                 } else {
-                    actionsHtml = `<span style="color: #888; font-size: 1.3rem;">Cancelled</span>`;
+                    actionsHtml = `<span style="color: #888; font-size: 1.3rem;">${appt.status === 'REJECTED' ? 'Rejected' : 'Cancelled'}</span>`;
                 }
             } else { // ADMIN
+                const queueKey = `${appt.doctor || ''}:${appt.date}`;
+                const canApprove = queuePositions.get(appt.id) === 1 && !confirmedDates.has(queueKey);
+                const waitingLabel = confirmedDates.has(queueKey) ? 'Date already approved' : 'Waiting in queue';
                 actionsHtml = `
                     <a href="/dashboard/appointments/edit/${appt.id}/" class="action-btn btn-approve"><i class="fas fa-edit"></i> Edit</a>
-                    ${appt.status !== 'CONFIRMED' ? `<button class="action-btn btn-approve" onclick="updateApptStatus(${appt.id}, 'CONFIRMED')"><i class="fas fa-check"></i> Approve</button>` : ''}
-                    ${appt.status !== 'CANCELLED' ? `<button class="action-btn btn-cancel" onclick="updateApptStatus(${appt.id}, 'CANCELLED')"><i class="fas fa-times"></i> Cancel</button>` : ''}
+                    ${appt.status === 'PENDING' ? (canApprove ? `<button class="action-btn btn-approve" onclick="updateApptStatus(${appt.id}, 'CONFIRMED')"><i class="fas fa-check"></i> Approve</button>` : `<button class="action-btn btn-approve" disabled>${waitingLabel}</button>`) : ''}
+                    ${['PENDING', 'CONFIRMED'].includes(appt.status) ? `<button class="action-btn btn-cancel" onclick="updateApptStatus(${appt.id}, 'CANCELLED')"><i class="fas fa-times"></i> Cancel</button>` : ''}
                     <button class="action-btn btn-delete" onclick="deleteAppt(${appt.id})"><i class="fas fa-trash"></i> Delete</button>
                 `;
             }
@@ -208,10 +234,13 @@ async function loadAppointmentsTable() {
                 <td>
                     <strong>${escapeHtml(appt.name)}</strong>
                     ${appt.doctor_name ? `<br><small style="color:var(--green); font-weight:600; font-size:1.2rem;"><i class="fas fa-user-md"></i> ${escapeHtml(appt.doctor_name)}</small>` : ''}
+                    ${appt.status === 'PENDING' ? `<small style="display:block; color:#666;">Queue position: ${appt.queue_position || queuePositions.get(appt.id)}</small>` : ''}
+                    ${appt.condition ? `<small title="${escapeHtml(appt.condition)}" style="display:block; max-width:24rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#666;">Condition: ${escapeHtml(appt.condition)}</small>` : ''}
                 </td>
                 <td>${escapeHtml(appt.number)}</td>
                 <td>${escapeHtml(appt.email)}</td>
                 <td>${appt.date}</td>
+                <td>${appt.time ? escapeHtml(appt.time.slice(0, 5)) : '-'}</td>
                 <td><span class="badge ${appt.status.toLowerCase()}">${appt.status}</span></td>
                 <td>${actionsHtml}</td>
             </tr>
@@ -232,8 +261,8 @@ async function cancelPatientAppt(id) {
 }
 
 async function updateApptStatus(id, status) {
-    if (status === 'CONFIRMED' && currentRole !== 'ADMIN') {
-        alert('Only Admin users can approve or confirm appointments.');
+    if (status === 'CONFIRMED' && !['ADMIN', 'DOCTOR'].includes(currentRole)) {
+        alert('Only the assigned doctor or an Admin can approve appointments.');
         return;
     }
     const res = await window.ApiService.updateAppointmentStatus(id, status);
@@ -476,7 +505,7 @@ async function loadPatientDoctorsBooking() {
     }
 }
 
-function openDoctorBookingModal(doctorId, doctorName, specialty) {
+async function openDoctorBookingModal(doctorId, doctorName, specialty) {
     closeDoctorBookingModal();
 
     const patientName = currentUser ? (currentUser.first_name ? `${currentUser.first_name} ${currentUser.last_name || ''}`.trim() : currentUser.username) : '';
@@ -509,9 +538,17 @@ function openDoctorBookingModal(doctorId, doctorName, specialty) {
                     <label style="display: block; font-size: 1.3rem; font-weight: 600; margin-bottom: .4rem; color: #444;">Email Address *</label>
                     <input type="email" id="modal-patient-email" value="${escapeHtml(patientEmail)}" placeholder="Your email address" required style="width:100%; padding:1rem; border:1px solid #ccc; border-radius:.5rem; font-size:1.4rem;">
                 </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label for="modal-patient-condition" style="display: block; font-size: 1.3rem; font-weight: 600; margin-bottom: .4rem; color: #444;">Describe your condition *</label>
+                    <textarea id="modal-patient-condition" rows="4" maxlength="2000" placeholder="Briefly describe your symptoms or reason for the visit" required style="width:100%; padding:1rem; border:1px solid #ccc; border-radius:.5rem; font-size:1.4rem; resize:vertical;"></textarea>
+                </div>
                 <div style="margin-bottom: 2rem;">
                     <label style="display: block; font-size: 1.3rem; font-weight: 600; margin-bottom: .4rem; color: #444;">Appointment Date *</label>
-                    <input type="date" id="modal-patient-date" min="${todayStr}" value="${todayStr}" required style="width:100%; padding:1rem; border:1px solid #ccc; border-radius:.5rem; font-size:1.4rem;">
+                    <input type="text" id="modal-patient-date" placeholder="Loading available dates..." required disabled style="width:100%; padding:1rem; border:1px solid #ccc; border-radius:.5rem; font-size:1.4rem;">
+                </div>
+                <div style="margin-bottom: 2rem;">
+                    <label for="modal-patient-time" style="display: block; font-size: 1.3rem; font-weight: 600; margin-bottom: .4rem; color: #444;">Appointment Time *</label>
+                    <input type="time" id="modal-patient-time" required style="width:100%; padding:1rem; border:1px solid #ccc; border-radius:.5rem; font-size:1.4rem;">
                 </div>
 
                 <div style="display: flex; gap: 1rem; justify-content: flex-end;">
@@ -524,6 +561,37 @@ function openDoctorBookingModal(doctorId, doctorName, specialty) {
 
     document.body.appendChild(modalOverlay);
 
+    const dateInput = document.getElementById('modal-patient-date');
+    const bookedDates = await window.ApiService.getBookedAppointmentDates(doctorId);
+    if (!dateInput.isConnected) return;
+    if (!bookedDates || typeof window.flatpickr !== 'function') {
+        showModalAlert(
+            document.getElementById('modal-alert-box'),
+            'Could not load appointment availability. Please refresh and try again.',
+            'error'
+        );
+        return;
+    }
+
+    dateInput.disabled = false;
+    window.flatpickr(dateInput, {
+        allowInput: false,
+        dateFormat: 'Y-m-d',
+        minDate: todayStr,
+        disable: bookedDates,
+        defaultDate: bookedDates.includes(todayStr) ? null : todayStr,
+        onOpen: async (_selectedDates, _dateString, picker) => {
+            const latestBookedDates = await window.ApiService.getBookedAppointmentDates(doctorId);
+            if (!latestBookedDates) return;
+            bookedDates.splice(0, bookedDates.length, ...latestBookedDates);
+            picker.set('disable', latestBookedDates);
+            if (picker.selectedDates[0] && latestBookedDates.includes(picker.formatDate(picker.selectedDates[0], 'Y-m-d'))) {
+                picker.clear();
+            }
+        },
+    });
+    dateInput.placeholder = 'Select an available date';
+
     const form = document.getElementById('modal-booking-form');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -531,12 +599,20 @@ function openDoctorBookingModal(doctorId, doctorName, specialty) {
         const name = document.getElementById('modal-patient-name').value.trim();
         const number = document.getElementById('modal-patient-phone').value.trim();
         const email = document.getElementById('modal-patient-email').value.trim();
+        const condition = document.getElementById('modal-patient-condition').value.trim();
         const date = document.getElementById('modal-patient-date').value;
+        const time = document.getElementById('modal-patient-time').value;
         const alertBox = document.getElementById('modal-alert-box');
         const submitBtn = document.getElementById('modal-submit-btn');
 
-        if (!name || !number || !email || !date) {
+        if (!name || !number || !email || !condition || !date || !time) {
             showModalAlert(alertBox, 'Please fill in all required fields.', 'error');
+            return;
+        }
+
+        if (bookedDates.includes(date)) {
+            dateInput.value = '';
+            showModalAlert(alertBox, 'That date is already booked with this doctor. Please choose another date.', 'error');
             return;
         }
 
@@ -561,7 +637,9 @@ function openDoctorBookingModal(doctorId, doctorName, specialty) {
                 name,
                 number,
                 email,
-                date
+                condition,
+                date,
+                time
             });
 
             if (res.success) {

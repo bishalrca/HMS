@@ -187,6 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 number: document.getElementById('appt-number').value.trim(),
                 email: document.getElementById('appt-email').value.trim(),
                 date: document.getElementById('appt-date').value,
+                time: document.getElementById('appt-time').value || null,
                 status: document.getElementById('appt-status').value
             };
 
@@ -253,6 +254,7 @@ async function loadAppointmentEditData(id) {
             document.getElementById('appt-number').value = data.number || '';
             document.getElementById('appt-email').value = data.email || '';
             document.getElementById('appt-date').value = data.date || '';
+            document.getElementById('appt-time').value = data.time ? data.time.slice(0, 5) : '';
             document.getElementById('appt-status').value = data.status || 'PENDING';
         }
     } catch (e) {
