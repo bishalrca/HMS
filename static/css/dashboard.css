@@ -317,6 +317,51 @@ body {
     font-weight: 500;
 }
 
+.stat-card-booking {
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.stat-card-booking:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, .12);
+}
+
+.stat-card .booking-appointment-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .8rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1rem 1.2rem;
+    border-radius: .5rem;
+    background: var(--green);
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+    transition: background-color .2s ease, box-shadow .2s ease;
+}
+
+.stat-card .booking-appointment-link:hover {
+    background: #117a65;
+    box-shadow: 0 .4rem 1rem rgba(0, 0, 0, .12);
+}
+
+.stat-card .booking-appointment-link:focus-visible {
+    outline: .3rem solid var(--green);
+    outline-offset: .3rem;
+}
+
+.stat-card .booking-appointment-link i {
+    flex: 0 0 auto;
+    margin: 0;
+    color: inherit;
+    font-size: 1.3rem;
+}
+
 /* Tables */
 .table-responsive {
     overflow-x: auto;

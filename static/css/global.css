@@ -9,6 +9,97 @@
     --border: .2rem solid var(--green);
 }
 
+.logout-confirm-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(42rem, calc(100vw - 4rem));
+    box-sizing: border-box;
+    padding: 3.2rem;
+    border: 1px solid rgba(16, 24, 40, .08);
+    border-radius: 1.2rem;
+    background: #fff;
+    color: var(--black);
+    text-align: center;
+    box-shadow: 0 2rem 6rem rgba(16, 24, 40, .24);
+}
+
+.logout-confirm-dialog::backdrop {
+    background: rgba(16, 24, 40, .58);
+    backdrop-filter: blur(3px);
+}
+
+.logout-dialog-icon {
+    display: grid;
+    place-items: center;
+    width: 6.4rem;
+    height: 6.4rem;
+    margin: 0 auto 1.8rem;
+    border-radius: 50%;
+    background: #fff1f0;
+    color: #d92d20;
+    font-size: 2.6rem;
+}
+
+.logout-confirm-dialog h2 {
+    margin: 0 0 .8rem;
+    color: var(--black);
+    font-size: 2.4rem;
+}
+
+.logout-confirm-dialog p {
+    margin: 0;
+    color: #667085;
+    font-size: 1.5rem;
+    line-height: 1.6;
+}
+
+.logout-dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2.8rem;
+}
+
+.logout-dialog-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .8rem;
+    min-height: 4.4rem;
+    padding: .9rem 1.6rem;
+    border: 1px solid transparent;
+    border-radius: .6rem;
+    font: inherit;
+    font-size: 1.4rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.logout-dialog-actions button:focus-visible {
+    outline: .3rem solid rgba(31, 154, 126, .45);
+    outline-offset: .2rem;
+}
+
+.logout-dialog-actions .logout-dialog-cancel {
+    border-color: #d0d5dd;
+    background: #fff;
+    color: var(--black);
+}
+
+.logout-dialog-actions .logout-dialog-cancel:hover {
+    background: #f9fafb;
+}
+
+.logout-dialog-actions .logout-dialog-confirm {
+    background: #d92d20;
+    color: #fff;
+}
+
+.logout-dialog-actions .logout-dialog-confirm:hover {
+    background: #b42318;
+}
+
 * {
     font-family: 'Poppins', sans-serif;
     margin: 0; padding: 0;

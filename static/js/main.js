@@ -105,6 +105,16 @@ async function initNavbarAuth() {
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
+                let confirmed;
+                try {
+                    confirmed = await showLogoutConfirmation();
+                } catch (error) {
+                    console.error('Failed to show logout confirmation:', error);
+                    window.alert('Unable to open the logout confirmation. Please refresh the page and try again.');
+                    return;
+                }
+                if (!confirmed) return;
+
                 if (window.ApiService) {
                     await window.ApiService.logout();
                 } else {
@@ -124,6 +134,34 @@ async function initNavbarAuth() {
             </a>
         `;
     }
+}
+
+async function showLogoutConfirmation() {
+    const response = await fetch('/static/popup.html');
+    if (!response.ok) {
+        throw new Error(`Failed to load logout confirmation (${response.status})`);
+    }
+
+    const popupDocument = new DOMParser().parseFromString(await response.text(), 'text/html');
+    const template = popupDocument.querySelector('#logout-confirm-dialog');
+    if (!(template instanceof HTMLDialogElement)) {
+        throw new Error('Logout confirmation template is missing its dialog');
+    }
+
+    const dialog = document.importNode(template, true);
+    document.body.append(dialog);
+
+    return new Promise(resolve => {
+        dialog.addEventListener('close', () => {
+            const confirmed = dialog.returnValue === 'logout';
+            dialog.remove();
+            resolve(confirmed);
+        }, { once: true });
+        dialog.addEventListener('click', event => {
+            if (event.target === dialog) dialog.close('cancel');
+        });
+        dialog.showModal();
+    });
 }
 
 function escapeHtml(str) {

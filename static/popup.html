@@ -1,0 +1,15 @@
+<dialog id="logout-confirm-dialog" class="logout-confirm-dialog"
+        aria-labelledby="logout-dialog-title"
+        aria-describedby="logout-dialog-description">
+    <div class="logout-dialog-icon" aria-hidden="true">
+        <i class="fas fa-sign-out-alt"></i>
+    </div>
+    <h2 id="logout-dialog-title">Log out?</h2>
+    <p id="logout-dialog-description">Are you sure you want to log out of the portal?</p>
+    <form method="dialog" class="logout-dialog-actions">
+        <button type="submit" value="cancel" class="logout-dialog-cancel" autofocus>Stay logged in</button>
+        <button type="submit" value="logout" class="logout-dialog-confirm">
+            <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Log out
+        </button>
+    </form>
+</dialog>

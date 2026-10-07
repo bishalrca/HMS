@@ -129,9 +129,38 @@ function renderRolePageHeader(user, role) {
 
 // Logout Handler
 async function handleLogout() {
-    if (confirm('Are you sure you want to log out of the portal?')) {
+    if (await showLogoutConfirmation()) {
         await window.ApiService.logout();
     }
+}
+
+async function showLogoutConfirmation() {
+    const response = await fetch('/static/popup.html');
+    if (!response.ok) {
+        throw new Error(`Failed to load logout confirmation (${response.status})`);
+    }
+
+    const popupDocument = new DOMParser().parseFromString(await response.text(), 'text/html');
+    const popupTemplate = popupDocument.querySelector('#logout-confirm-dialog');
+    if (!(popupTemplate instanceof HTMLDialogElement)) {
+        throw new Error('Logout confirmation template is missing its dialog');
+    }
+
+    const dialog = document.importNode(popupTemplate, true);
+    document.body.append(dialog);
+    return new Promise(resolve => {
+        const finish = () => {
+            const shouldLogout = dialog.returnValue === 'logout';
+            dialog.remove();
+            resolve(shouldLogout);
+        };
+
+        dialog.addEventListener('close', finish, { once: true });
+        dialog.addEventListener('click', event => {
+            if (event.target === dialog) dialog.close('cancel');
+        });
+        dialog.showModal();
+    });
 }
 
 // Load Stats Summary
@@ -152,12 +181,12 @@ async function loadDashboardStats() {
             if (currentRole === 'PATIENT' && docEl) {
                 const docCard = docEl.closest('.stat-card');
                 if (docCard) {
+                    docCard.classList.add('stat-card-booking');
                     docCard.innerHTML = `
                         <i class="fas fa-calendar-plus" style="color: var(--green);"></i>
                         <h3 style="font-size: 2.2rem; color: var(--green);">Book</h3>
-                        <p><a href="/pages/appointment.html" style="color: var(--green); font-weight: bold; text-decoration: underline;">Book New Appointment &rarr;</a></p>
+                        <p><a href="/pages/appointment.html" class="booking-appointment-link">Book New Appointment <i class="fas fa-arrow-right" aria-hidden="true"></i></a></p>
                     `;
-                    docCard.style.cursor = 'pointer';
                     docCard.onclick = () => window.location.href = '/pages/appointment.html';
                 }
             }
